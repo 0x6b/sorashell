@@ -50,24 +50,25 @@ func (s *SoracomCompleter) Complete(d prompt.Document) []prompt.Suggest {
 		default:
 			return []prompt.Suggest{}
 		}
-	} else { // flags completion
-		if len(found) != 1 { // if we don't have specific command we can't provide args suggestion
-			return []prompt.Suggest{{
-				Text:        "Error",
-				Description: "cannot find matching command",
-			}}
-		}
-
-		params := s.searchParams(commands, flags)
-		r := make([]prompt.Suggest, 0)
-		for _, p := range params {
-			r = append(r, prompt.Suggest{
-				Text:        "--" + strings.ReplaceAll(p.name, "_", "-"),
-				Description: p.description,
-			})
-		}
-		return prompt.FilterFuzzy(r, d.GetWordBeforeCursorWithSpace(), true)
 	}
+
+	// flags completion
+	if len(found) != 1 { // if we don't have specific command we can't provide args suggestion
+		return []prompt.Suggest{{
+			Text:        "Error",
+			Description: "cannot find matching command",
+		}}
+	}
+
+	params := s.searchParams(commands, flags)
+	r := make([]prompt.Suggest, 0)
+	for _, p := range params {
+		r = append(r, prompt.Suggest{
+			Text:        "--" + strings.ReplaceAll(p.name, "_", "-"),
+			Description: p.description,
+		})
+	}
+	return prompt.FilterFuzzy(r, d.GetWordBeforeCursorWithSpace(), true)
 }
 
 // search API methods which has x-soracom-cli definition starts with given term
@@ -132,15 +133,6 @@ func (s *SoracomCompleter) searchParams(commands, flags string) []param {
 	})
 
 	return found
-}
-
-func contains(flags []flag, param string) bool {
-	for _, f := range flags {
-		if f.name == strings.ReplaceAll(param, "_", "-") {
-			return true
-		}
-	}
-	return false
 }
 
 // return one command suggestion.
@@ -228,6 +220,16 @@ func splitToCommandsAndFlags(line string) (string, string) {
 		return line[:strings.Index(line, "--")], strings.TrimSpace(line[strings.Index(line, "--"):])
 	}
 	return line, ""
+}
+
+// check if given flags contains given string
+func contains(flags []flag, param string) bool {
+	for _, f := range flags {
+		if f.name == strings.ReplaceAll(param, "_", "-") {
+			return true
+		}
+	}
+	return false
 }
 
 func endsWithPipeOrRedirect(s string) bool {
