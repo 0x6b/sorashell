@@ -109,6 +109,18 @@ func (suite *SoracomCompleterTestSuite) TestGetParametersForCli() {
 			},
 		},
 		{
+			input: "users password configured --operator-id OPXXX --",
+			expected: []param{
+				{
+					name:        "user-name",
+					required:    true,
+					description: "user_name",
+					paramType:   "string",
+					enum:        []string(nil),
+				},
+			},
+		},
+		{
 			input: "groups delete-config",
 			expected: []param{
 				{
@@ -147,7 +159,8 @@ func (suite *SoracomCompleterTestSuite) TestGetParametersForCli() {
 	}
 
 	for _, t := range tests {
-		r := suite.completer.searchParams(t.input)
+		commands, flags := splitToCommandsAndFlags(t.input)
+		r := suite.completer.searchParams(commands, flags)
 		suite.Equal(t.expected, r)
 	}
 }

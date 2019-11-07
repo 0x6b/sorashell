@@ -58,11 +58,8 @@ func (s *SoracomCompleter) Complete(d prompt.Document) []prompt.Suggest {
 			}}
 		}
 
-		//parsedArgs := parseFlags(flags)
-		params := s.searchParams(commands)
-
+		params := s.searchParams(commands, flags)
 		r := make([]prompt.Suggest, 0)
-
 		for _, p := range params {
 			r = append(r, prompt.Suggest{
 				Text:        "--" + strings.ReplaceAll(p.name, "_", "-"),
@@ -104,8 +101,9 @@ func (s *SoracomCompleter) searchMethods(term string) []lib.APIMethod {
 }
 
 // search parameters for cli definition
-func (s *SoracomCompleter) searchParams(term string) []param {
+func (s *SoracomCompleter) searchParams(commands, flags string) []param {
 	found := make([]param, 0)
+	parsedFlags := parseFlags(flags)
 
 	for _, method := range s.apiDef.Methods {
 		if method.CLI == nil || len(method.CLI) == 0 {
@@ -113,15 +111,17 @@ func (s *SoracomCompleter) searchParams(term string) []param {
 		}
 
 		for _, cli := range method.CLI {
-			if strings.Compare(cli, strings.TrimSpace(term)) == 0 {
+			if strings.Compare(cli, strings.TrimSpace(commands)) == 0 {
 				for _, p := range method.Parameters {
-					found = append(found, param{
-						name:        strings.ReplaceAll(p.Name, "_", "-"),
-						required:    p.Required,
-						description: p.Description,
-						paramType:   p.Type,
-						enum:        p.Enum,
-					})
+					if !contains(parsedFlags, p.Name) {
+						found = append(found, param{
+							name:        strings.ReplaceAll(p.Name, "_", "-"),
+							required:    p.Required,
+							description: p.Description,
+							paramType:   p.Type,
+							enum:        p.Enum,
+						})
+					}
 				}
 			}
 		}
@@ -132,6 +132,15 @@ func (s *SoracomCompleter) searchParams(term string) []param {
 	})
 
 	return found
+}
+
+func contains(flags []flag, param string) bool {
+	for _, f := range flags {
+		if f.name == strings.ReplaceAll(param, "_", "-") {
+			return true
+		}
+	}
+	return false
 }
 
 // return one command suggestion.
