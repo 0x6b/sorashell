@@ -156,6 +156,18 @@ func (suite *SoracomCompleterTestSuite) TestGetParametersForCli() {
 				},
 			},
 		},
+		{
+			input: "groups delete-config --group-id xxx --namespace SoracomAir",
+			expected: []param{
+				{
+					name:        "name",
+					required:    true,
+					description: "Parameter name to be deleted. (This will be part of a URL path, so it needs to be percent-encoded. In JavaScript, specify the name after it has been encoded using encodeURIComponent().)",
+					paramType:   "string",
+					enum:        []string(nil),
+				},
+			},
+		},
 	}
 
 	for _, t := range tests {
