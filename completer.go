@@ -39,16 +39,16 @@ func (s *SoracomCompleter) Complete(d gp.Document) []gp.Suggest {
 	}
 
 	commands, flags := splitToCommandsAndFlags(line)
-	methods := s.searchMethods(commands)
+	methods, found := s.searchMethods(commands)
+
 	if len(flags) == 0 { // command completion
-		switch l := len(methods); {
-		case l == 1:
-			return suggestion(methods[0], commands)
-		case l > 1:
-			return suggestions(methods, commands)
-		default:
+		if !found {
 			return []gp.Suggest{}
 		}
+		if len(methods) == 1 {
+			return suggestion(methods[0], commands)
+		}
+		return suggestions(methods, commands)
 	}
 
 	// flags completion
@@ -58,12 +58,15 @@ func (s *SoracomCompleter) Complete(d gp.Document) []gp.Suggest {
 			Description: "cannot find matching command",
 		}}
 	}
-	params := s.searchParams(commands, flags)
-	return paramSuggestions(params, d.GetWordBeforeCursorWithSpace())
+	if params, found := s.searchParams(commands, flags); found {
+		return paramSuggestions(params, d.GetWordBeforeCursorWithSpace())
+	}
+
+	return []gp.Suggest{}
 }
 
 // search API methods which has x-soracom-cli definition starts with given term
-func (s *SoracomCompleter) searchMethods(term string) []sl.APIMethod {
+func (s *SoracomCompleter) searchMethods(term string) ([]sl.APIMethod, bool) {
 	found := make([]sl.APIMethod, 0)
 
 	for _, method := range s.apiDef.Methods {
@@ -89,11 +92,14 @@ func (s *SoracomCompleter) searchMethods(term string) []sl.APIMethod {
 		return pickCliDefForPrefix(found[i].CLI, term) < pickCliDefForPrefix(found[j].CLI, term)
 	})
 
-	return found
+	if len(found) == 0 {
+		return found, false
+	}
+	return found, true
 }
 
 // search parameters for cli definition
-func (s *SoracomCompleter) searchParams(commands, flags string) []param {
+func (s *SoracomCompleter) searchParams(commands, flags string) ([]param, bool) {
 	found := make([]param, 0)
 	parsedFlags := parseFlags(flags)
 
@@ -123,7 +129,10 @@ func (s *SoracomCompleter) searchParams(commands, flags string) []param {
 		return found[i].name < found[j].name
 	})
 
-	return found
+	if len(found) == 0 {
+		return found, false
+	}
+	return found, true
 }
 
 // return one command suggestion.
@@ -164,15 +173,30 @@ func suggestions(methods []sl.APIMethod, commands string) []gp.Suggest {
 	return suggestions
 }
 
+// return flag (name or value) suggestions.
 func paramSuggestions(params []param, param string) []gp.Suggest {
-	r := make([]gp.Suggest, 0)
-	for _, p := range params {
-		r = append(r, gp.Suggest{
-			Text:        "--" + strings.ReplaceAll(p.name, "_", "-"),
-			Description: p.description,
-		})
+	if strings.HasPrefix(param, "--") { // name suggestion
+		r := make([]gp.Suggest, 0)
+		for _, p := range params {
+			required := ""
+			if p.required {
+				required = "(required) "
+			}
+
+			r = append(r, gp.Suggest{
+				Text:        "--" + strings.ReplaceAll(p.name, "_", "-"),
+				Description: required + p.description,
+			})
+		}
+		return gp.FilterFuzzy(r, param, true)
+	} else { // value suggestion
+		// get previous word
+		// if specific name is found, do more intelligent completion
+		// else get type for previous word
+		// if type is enum, provide possible values
+		// else do nothing
 	}
-	return gp.FilterFuzzy(r, param, true)
+	return []gp.Suggest{}
 }
 
 // parse flags

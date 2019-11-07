@@ -172,7 +172,7 @@ func (suite *SoracomCompleterTestSuite) TestGetParametersForCli() {
 
 	for _, t := range tests {
 		commands, flags := splitToCommandsAndFlags(t.input)
-		r := suite.completer.searchParams(commands, flags)
+		r, _ := suite.completer.searchParams(commands, flags)
 		suite.Equal(t.expected, r)
 	}
 }
