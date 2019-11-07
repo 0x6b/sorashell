@@ -39,21 +39,21 @@ func (s *SoracomCompleter) Complete(d prompt.Document) []prompt.Suggest {
 	}
 
 	commands, flags := splitToCommandsAndFlags(line)
-	found := s.searchMethods(commands)
+	methods := s.searchMethods(commands)
 
 	if len(flags) == 0 { // command completion
-		switch l := len(found); {
+		switch l := len(methods); {
 		case l == 1:
-			return suggestion(found[0], commands)
+			return suggestion(methods[0], commands)
 		case l > 1:
-			return suggestions(found, commands)
+			return suggestions(methods, commands)
 		default:
 			return []prompt.Suggest{}
 		}
 	}
 
 	// flags completion
-	if len(found) != 1 { // if we don't have specific command we can't provide args suggestion
+	if len(methods) != 1 { // if we don't have specific method we can't provide flags suggestion
 		return []prompt.Suggest{{
 			Text:        "Error",
 			Description: "cannot find matching command",
@@ -154,12 +154,12 @@ func suggestion(found lib.APIMethod, commands string) []prompt.Suggest {
 }
 
 // return command suggestions.
-func suggestions(found []lib.APIMethod, commands string) []prompt.Suggest {
+func suggestions(methods []sl.APIMethod, commands string) []gp.Suggest {
 	tmp := make(map[string]bool)
 	suggestions := make([]prompt.Suggest, 0)
 	n := strings.Count(commands, " ")
 
-	for _, apiMethod := range found {
+	for _, apiMethod := range methods {
 		cli := strings.Split(pickCliDefForPrefix(apiMethod.CLI, commands), " ")[n]
 		if !tmp[cli] {
 			tmp[cli] = true
