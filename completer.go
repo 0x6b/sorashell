@@ -1,8 +1,8 @@
 package shell
 
 import (
-	"github.com/c-bata/go-prompt"
-	"github.com/soracom/soracom-cli/generators/lib"
+	gp "github.com/c-bata/go-prompt"
+	sl "github.com/soracom/soracom-cli/generators/lib"
 	"log"
 	"sort"
 	"strings"
@@ -10,7 +10,7 @@ import (
 
 // NewSoracomCompleter returns a SoracomCompleter which is based on  api definition loaded from given apiDefPath.
 func NewSoracomCompleter(apiDefPath string) *SoracomCompleter {
-	apiDef, err := lib.LoadAPIDef(apiDefPath)
+	apiDef, err := sl.LoadAPIDef(apiDefPath)
 	if err != nil {
 		log.Fatalf("%+v\n", err)
 	}
@@ -18,20 +18,20 @@ func NewSoracomCompleter(apiDefPath string) *SoracomCompleter {
 }
 
 // Complete returns suggestions for given Document.
-func (s *SoracomCompleter) Complete(d prompt.Document) []prompt.Suggest {
+func (s *SoracomCompleter) Complete(d gp.Document) []gp.Suggest {
 	line := d.CurrentLine()
 
 	if line == "" {
-		return []prompt.Suggest{}
+		return []gp.Suggest{}
 	}
 
 	if endsWithPipeOrRedirect(line) {
-		return []prompt.Suggest{}
+		return []gp.Suggest{}
 	}
 
 	// return from hard corded Commands as atm don't have a way to find top-level commands from API definition
 	if isFirstCommand(line) {
-		s := prompt.FilterFuzzy(Commands, line, true)
+		s := gp.FilterFuzzy(Commands, line, true)
 		sort.Slice(s, func(i, j int) bool {
 			return s[i].Text < s[j].Text
 		})
@@ -48,32 +48,32 @@ func (s *SoracomCompleter) Complete(d prompt.Document) []prompt.Suggest {
 		case l > 1:
 			return suggestions(methods, commands)
 		default:
-			return []prompt.Suggest{}
+			return []gp.Suggest{}
 		}
 	}
 
 	// flags completion
 	if len(methods) != 1 { // if we don't have specific method we can't provide flags suggestion
-		return []prompt.Suggest{{
+		return []gp.Suggest{{
 			Text:        "Error",
 			Description: "cannot find matching command",
 		}}
 	}
 
 	params := s.searchParams(commands, flags)
-	r := make([]prompt.Suggest, 0)
+	r := make([]gp.Suggest, 0)
 	for _, p := range params {
-		r = append(r, prompt.Suggest{
+		r = append(r, gp.Suggest{
 			Text:        "--" + strings.ReplaceAll(p.name, "_", "-"),
 			Description: p.description,
 		})
 	}
-	return prompt.FilterFuzzy(r, d.GetWordBeforeCursorWithSpace(), true)
+	return gp.FilterFuzzy(r, d.GetWordBeforeCursorWithSpace(), true)
 }
 
 // search API methods which has x-soracom-cli definition starts with given term
-func (s *SoracomCompleter) searchMethods(term string) []lib.APIMethod {
-	found := make([]lib.APIMethod, 0)
+func (s *SoracomCompleter) searchMethods(term string) []sl.APIMethod {
+	found := make([]sl.APIMethod, 0)
 
 	for _, method := range s.apiDef.Methods {
 		if method.CLI == nil || len(method.CLI) == 0 {
@@ -136,7 +136,7 @@ func (s *SoracomCompleter) searchParams(commands, flags string) []param {
 }
 
 // return one command suggestion.
-func suggestion(found lib.APIMethod, commands string) []prompt.Suggest {
+func suggestion(found sl.APIMethod, commands string) []gp.Suggest {
 	cli := pickCliDefForPrefix(found.CLI, commands)
 	n := strings.Count(commands, " ")
 
@@ -145,7 +145,7 @@ func suggestion(found lib.APIMethod, commands string) []prompt.Suggest {
 	// - match result:     "users password delete"
 	// - number of spaces: 2
 	// - returns:          "delete"
-	return []prompt.Suggest{
+	return []gp.Suggest{
 		{
 			Text:        strings.Join(strings.Split(cli, " ")[n:], " "),
 			Description: found.Summary,
@@ -156,14 +156,14 @@ func suggestion(found lib.APIMethod, commands string) []prompt.Suggest {
 // return command suggestions.
 func suggestions(methods []sl.APIMethod, commands string) []gp.Suggest {
 	tmp := make(map[string]bool)
-	suggestions := make([]prompt.Suggest, 0)
+	suggestions := make([]gp.Suggest, 0)
 	n := strings.Count(commands, " ")
 
 	for _, apiMethod := range methods {
 		cli := strings.Split(pickCliDefForPrefix(apiMethod.CLI, commands), " ")[n]
 		if !tmp[cli] {
 			tmp[cli] = true
-			suggestions = append(suggestions, prompt.Suggest{
+			suggestions = append(suggestions, gp.Suggest{
 				Text:        cli,
 				Description: apiMethod.Summary,
 			})

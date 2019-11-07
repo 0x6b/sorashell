@@ -1,7 +1,7 @@
 package shell
 
 import (
-	"github.com/c-bata/go-prompt"
+	gp "github.com/c-bata/go-prompt"
 	"github.com/stretchr/testify/suite"
 	"testing"
 )
@@ -229,10 +229,10 @@ func (suite *SoracomCompleterTestSuite) TestComplete() {
 	}
 
 	for _, t := range tests {
-		d := prompt.Document{Text: t.input}
+		d := gp.Document{Text: t.input}
 
 		complete := suite.completer.Complete(d)
-		r := toStringSlice(complete, func(d prompt.Suggest) string {
+		r := toStringSlice(complete, func(d gp.Suggest) string {
 			return d.Text
 		})
 
@@ -247,10 +247,10 @@ func (suite *SoracomCompleterTestSuite) TestIncompleteCommand() {
 	}
 
 	for _, t := range tests {
-		d := prompt.Document{Text: t}
+		d := gp.Document{Text: t}
 
 		complete := suite.completer.Complete(d)
-		r := toStringSlice(complete, func(d prompt.Suggest) string {
+		r := toStringSlice(complete, func(d gp.Suggest) string {
 			return d.Text
 		})
 
@@ -263,7 +263,7 @@ func TestSoracomCompleterTestSuite(t *testing.T) {
 	suite.Run(t, new(SoracomCompleterTestSuite))
 }
 
-func toStringSlice(suggests []prompt.Suggest, f func(s prompt.Suggest) string) []string {
+func toStringSlice(suggests []gp.Suggest, f func(s gp.Suggest) string) []string {
 	r := make([]string, len(suggests))
 	for i, v := range suggests {
 		r[i] = f(v)

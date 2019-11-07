@@ -1,8 +1,8 @@
 package shell
 
-import "github.com/c-bata/go-prompt"
+import gp "github.com/c-bata/go-prompt"
 
-var Commands = []prompt.Suggest{
+var Commands = []gp.Suggest{
 	{Text: "audit-logs", Description: "Retrieve audit logs."},
 	{Text: "bills", Description: "Show or export billing info."},
 	{Text: "coupons", Description: "List or register coupons."},
