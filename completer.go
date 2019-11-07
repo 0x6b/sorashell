@@ -40,7 +40,6 @@ func (s *SoracomCompleter) Complete(d gp.Document) []gp.Suggest {
 
 	commands, flags := splitToCommandsAndFlags(line)
 	methods := s.searchMethods(commands)
-
 	if len(flags) == 0 { // command completion
 		switch l := len(methods); {
 		case l == 1:
@@ -59,16 +58,8 @@ func (s *SoracomCompleter) Complete(d gp.Document) []gp.Suggest {
 			Description: "cannot find matching command",
 		}}
 	}
-
 	params := s.searchParams(commands, flags)
-	r := make([]gp.Suggest, 0)
-	for _, p := range params {
-		r = append(r, gp.Suggest{
-			Text:        "--" + strings.ReplaceAll(p.name, "_", "-"),
-			Description: p.description,
-		})
-	}
-	return gp.FilterFuzzy(r, d.GetWordBeforeCursorWithSpace(), true)
+	return paramSuggestions(params, d.GetWordBeforeCursorWithSpace())
 }
 
 // search API methods which has x-soracom-cli definition starts with given term
@@ -171,6 +162,17 @@ func suggestions(methods []sl.APIMethod, commands string) []gp.Suggest {
 	}
 
 	return suggestions
+}
+
+func paramSuggestions(params []param, param string) []gp.Suggest {
+	r := make([]gp.Suggest, 0)
+	for _, p := range params {
+		r = append(r, gp.Suggest{
+			Text:        "--" + strings.ReplaceAll(p.name, "_", "-"),
+			Description: p.description,
+		})
+	}
+	return gp.FilterFuzzy(r, param, true)
 }
 
 // parse flags
