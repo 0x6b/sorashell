@@ -13,18 +13,24 @@ Interactive shell for [`soracom-cli`](https://github.com/soracom/soracom-cli/). 
 
 1. Install and configure `soracom-cli` according to the repo's README
 2. Run `soracom-shell`
-3. Enjoy
-    - the shell automatically provides suggestions as you type
-    - hit <kbd>Tab</kbd> to move cursor
+3. The shell automatically provides suggestions as you type. Enjoy!
+    - <kbd>Tab</kbd> to move cursor
     - <kbd>Space</kbd> to select
 
-## Build
+## Development
+
+### Setup
+
+1. Install [Go](https://golang.org/) 1.13 or later
+2. Install [rakyll/statik](https://github.com/rakyll/statik), asset embedder: `go get github.com/rakyll/statik`
+
+### Build
 
 ```console
-$ make
+$ make soracom-shell
 ```
 
-## Test
+### Test
 
 ```console
 $ make test

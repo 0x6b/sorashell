@@ -8,6 +8,8 @@
 .idea/
 helper/
 tmp/
+statik/*.go
+assets/*.yaml
 
 download-assets
 soracom-shell
