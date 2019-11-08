@@ -47,9 +47,9 @@ func (s *SoracomCompleter) Complete(d gp.Document) []gp.Suggest {
 			return []gp.Suggest{}
 		}
 		if len(methods) == 1 {
-			return suggestion(methods[0], commands)
+			return commandSuggestion(methods[0], commands)
 		}
-		return suggestions(methods, commands)
+		return commandSuggestions(methods, commands)
 	}
 
 	// flags completion
@@ -137,8 +137,8 @@ func (s *SoracomCompleter) searchParams(commands, flags string) ([]param, bool) 
 }
 
 // return one command suggestion.
-func suggestion(found sl.APIMethod, commands string) []gp.Suggest {
-	cli := pickCliDefForPrefix(found.CLI, commands)
+func commandSuggestion(method sl.APIMethod, commands string) []gp.Suggest {
+	cli := pickCliDefForPrefix(method.CLI, commands)
 	n := strings.Count(commands, " ")
 
 	// return only text after current commands as suggestion e.g.
@@ -149,13 +149,13 @@ func suggestion(found sl.APIMethod, commands string) []gp.Suggest {
 	return []gp.Suggest{
 		{
 			Text:        strings.Join(strings.Split(cli, " ")[n:], " "),
-			Description: found.Summary,
+			Description: method.Summary,
 		},
 	}
 }
 
 // return command suggestions.
-func suggestions(methods []sl.APIMethod, commands string) []gp.Suggest {
+func commandSuggestions(methods []sl.APIMethod, commands string) []gp.Suggest {
 	tmp := make(map[string]bool)
 	suggestions := make([]gp.Suggest, 0)
 	n := strings.Count(commands, " ")
