@@ -23,20 +23,24 @@ func (e *SoracomExecutor) Execute(s string) {
 	s = strings.TrimSpace(s)
 	if s == "" {
 		return
-	} else if s == "quit" || s == "exit" {
+	}
+
+	if s == "quit" || s == "exit" {
 		fmt.Println("Bye!")
 		os.Exit(0)
 		return
 	}
 
-	var cmd *exec.Cmd
 	if strings.HasPrefix(s, "!cd") {
 		dir := strings.Split(s, " ")[1]
 		if err := os.Chdir(dir); err != nil {
 			fmt.Println("failed to change directory: " + dir)
 		}
 		return
-	} else if strings.HasPrefix(s, "!") {
+	}
+
+	var cmd *exec.Cmd
+	if strings.HasPrefix(s, "!") {
 		cmd = exec.Command("/bin/sh", "-c", strings.TrimPrefix(s, "!"))
 	} else {
 		cmd = exec.Command("/bin/sh", "-c", "soracom "+s)
