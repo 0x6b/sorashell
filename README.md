@@ -35,3 +35,7 @@ $ make soracom-shell
 ```console
 $ make test
 ```
+
+## Acknowledgements
+
+[c-bata/go-prompt](https://github.com/c-bata/go-prompt/) and [soracom/soracom-cli](https://github.com/soracom/soracom-cli/), which does all the heavy lifting.
