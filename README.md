@@ -11,11 +11,11 @@ Interactive shell for [`soracom-cli`](https://github.com/soracom/soracom-cli/). 
 
 ## Usage
 
-1. Install and configure `soracom-cli` according to repo's README
+1. Install and configure `soracom-cli` according to the repo's README
 2. Run `soracom-shell`
 3. Enjoy
     - the shell automatically provides suggestions as you type
-    - hit <kbd>Tab</kdb> to move cursor
+    - hit <kbd>Tab</kbd> to move cursor
     - <kbd>Space</kbd> to select
 
 ## Build
