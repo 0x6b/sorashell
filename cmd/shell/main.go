@@ -8,7 +8,7 @@ import (
 
 func main() {
 	executor := shell.NewSoracomExecutor("/bin/sh")
-	completer := shell.NewSoracomCompleter("assets/soracom-api.en.yaml")
+	completer := shell.NewSoracomCompleter("/soracom-api.en.yaml")
 
 	fmt.Print(`
               ..;;ttLLSSSSSSLLtt;;..
