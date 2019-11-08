@@ -12,7 +12,7 @@ type SoracomCompleterTestSuite struct {
 }
 
 func (suite *SoracomCompleterTestSuite) SetupTest() {
-	suite.completer = NewSoracomCompleter("resources/soracom-api.en.yaml")
+	suite.completer = NewSoracomCompleter("assets/soracom-api.en.yaml")
 }
 
 func (suite *SoracomCompleterTestSuite) TestSplitToCommandsAndArgs() {
