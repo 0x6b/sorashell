@@ -93,10 +93,7 @@ func (s *SoracomCompleter) searchMethods(term string) ([]sl.APIMethod, bool) {
 		return pickCliDefForPrefix(found[i].CLI, term) < pickCliDefForPrefix(found[j].CLI, term)
 	})
 
-	if len(found) == 0 {
-		return found, false
-	}
-	return found, true
+	return found, len(found) > 0
 }
 
 // search parameters for cli definition
@@ -130,10 +127,7 @@ func (s *SoracomCompleter) searchParams(commands, flags string) ([]param, bool) 
 		return found[i].name < found[j].name
 	})
 
-	if len(found) == 0 {
-		return found, false
-	}
-	return found, true
+	return found, len(found) > 0
 }
 
 // return one command suggestion.
