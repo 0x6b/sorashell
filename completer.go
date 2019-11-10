@@ -59,8 +59,8 @@ func (s *SoracomCompleter) Complete(d gp.Document) []gp.Suggest {
 			Description: "cannot find matching command",
 		}}
 	}
-	if params, found := s.searchParams(methods, flags); found {
-		return paramSuggestions(params, d.GetWordBeforeCursorWithSpace())
+	if params, found := s.searchParams(methods[0], flags); found {
+		return paramSuggestions(methods[0], params, d.GetWordBeforeCursorWithSpace())
 	}
 
 	return []gp.Suggest{}
@@ -101,21 +101,15 @@ func (s *SoracomCompleter) searchParams(methods []sl.APIMethod, flags string) ([
 	found := make([]param, 0)
 	parsedFlags := parseFlags(flags)
 
-	for _, method := range methods {
-		if method.CLI == nil || len(method.CLI) == 0 {
-			continue
-		}
-
-		for _, p := range method.Parameters {
-			if !contains(parsedFlags, p.Name) {
-				found = append(found, param{
-					name:        strings.ReplaceAll(p.Name, "_", "-"),
-					required:    p.Required,
-					description: p.Description,
-					paramType:   p.Type,
-					enum:        p.Enum,
-				})
-			}
+	for _, p := range method.Parameters {
+		if !contains(parsedFlags, p.Name) {
+			found = append(found, param{
+				name:        strings.ReplaceAll(p.Name, "_", "-"),
+				required:    p.Required,
+				description: p.Description,
+				paramType:   p.Type,
+				enum:        p.Enum,
+			})
 		}
 	}
 
@@ -165,7 +159,7 @@ func commandSuggestions(methods []sl.APIMethod, commands string) []gp.Suggest {
 }
 
 // return flag (name or value) suggestions.
-func paramSuggestions(params []param, param string) []gp.Suggest {
+func paramSuggestions(method sl.APIMethod, params []param, param string) []gp.Suggest {
 	if strings.HasPrefix(param, "--") { // name suggestion
 		r := make([]gp.Suggest, 0)
 		for _, p := range params {
