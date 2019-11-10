@@ -185,7 +185,7 @@ func (suite *SoracomCompleterTestSuite) TestComplete() {
 	}{
 		{
 			input:    "",
-			expected: []string{},
+			expected: []string{"audit-logs", "bills", "coupons", "credentials", "data", "devices", "event-handlers", "files", "gadgets", "groups", "lagoon", "logs", "lora-devices", "lora-gateways", "lora-network-sets", "operator", "orders", "payer-information", "payment-history", "payment-methods", "payment-statements", "port-mappings", "products", "query", "roles", "sandbox", "shipping-addresses", "sigfox-devices", "stats", "subscribers", "test", "users", "version", "volume-discounts", "vpg"},
 		},
 		{
 			input:    "s",

@@ -22,21 +22,17 @@ func NewSoracomCompleter(apiDefPath string) *SoracomCompleter {
 func (s *SoracomCompleter) Complete(d gp.Document) []gp.Suggest {
 	line := d.CurrentLine()
 
-	if line == "" {
-		return []gp.Suggest{}
-	}
-
-	if endsWithPipeOrRedirect(line) {
-		return []gp.Suggest{}
-	}
-
 	// return from hard corded Commands as atm don't have a way to find top-level commands from API definition
-	if isFirstCommand(line) {
+	if line == "" || isFirstCommand(line) {
 		s := gp.FilterFuzzy(Commands, line, true)
 		sort.Slice(s, func(i, j int) bool {
 			return s[i].Text < s[j].Text
 		})
 		return s
+	}
+
+	if endsWithPipeOrRedirect(line) {
+		return []gp.Suggest{}
 	}
 
 	commands, flags := splitToCommandsAndFlags(line)
