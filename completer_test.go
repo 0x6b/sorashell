@@ -84,100 +84,6 @@ func (suite *SoracomCompleterTestSuite) TestParseFlags() {
 	}
 }
 
-func (suite *SoracomCompleterTestSuite) TestSearchParams() {
-	tests := []struct {
-		input    string
-		expected []param
-	}{
-		{
-			input: "users password configured",
-			expected: []param{
-				{
-					name:        "operator-id",
-					required:    true,
-					description: "operator_id",
-					paramType:   "string",
-					enum:        []string(nil),
-				},
-				{
-					name:        "user-name",
-					required:    true,
-					description: "user_name",
-					paramType:   "string",
-					enum:        []string(nil),
-				},
-			},
-		},
-		{
-			input: "users password configured --operator-id OPXXX --",
-			expected: []param{
-				{
-					name:        "user-name",
-					required:    true,
-					description: "user_name",
-					paramType:   "string",
-					enum:        []string(nil),
-				},
-			},
-		},
-		{
-			input: "groups delete-config",
-			expected: []param{
-				{
-					name:        "group-id",
-					required:    true,
-					description: "Target group.",
-					paramType:   "string",
-					enum:        []string(nil),
-				},
-				{
-					name:        "name",
-					required:    true,
-					description: "Parameter name to be deleted. (This will be part of a URL path, so it needs to be percent-encoded. In JavaScript, specify the name after it has been encoded using encodeURIComponent().)",
-					paramType:   "string",
-					enum:        []string(nil),
-				},
-				{
-					name:        "namespace",
-					required:    true,
-					description: "Namespace of target parameters.",
-					paramType:   "string",
-					enum: []string{
-						"SoracomAir",
-						"SoracomBeam",
-						"SoracomEndorse",
-						"SoracomFunk",
-						"SoracomFunnel",
-						"SoracomHarvest",
-						"SoracomHarvestFiles",
-						"SoracomKrypton",
-						"UnifiedEndpoint",
-					},
-				},
-			},
-		},
-		{
-			input: "groups delete-config --group-id xxx --namespace SoracomAir",
-			expected: []param{
-				{
-					name:        "name",
-					required:    true,
-					description: "Parameter name to be deleted. (This will be part of a URL path, so it needs to be percent-encoded. In JavaScript, specify the name after it has been encoded using encodeURIComponent().)",
-					paramType:   "string",
-					enum:        []string(nil),
-				},
-			},
-		},
-	}
-
-	for _, t := range tests {
-		commands, flags := splitToCommandsAndFlags(t.input)
-		methods, _ := suite.completer.searchMethods(commands)
-		r := suite.completer.searchParams(methods[0], flags)
-		suite.Equal(t.expected, r)
-	}
-}
-
 func (suite *SoracomCompleterTestSuite) TestComplete() {
 	tests := []struct {
 		input    string
@@ -185,7 +91,7 @@ func (suite *SoracomCompleterTestSuite) TestComplete() {
 	}{
 		{
 			input:    "",
-			expected: []string{},
+			expected: []string{"audit-logs", "bills", "coupons", "credentials", "data", "devices", "event-handlers", "files", "gadgets", "groups", "lagoon", "logs", "lora-devices", "lora-gateways", "lora-network-sets", "operator", "orders", "payer-information", "payment-history", "payment-methods", "payment-statements", "port-mappings", "products", "query", "roles", "sandbox", "shipping-addresses", "sigfox-devices", "stats", "subscribers", "test", "users", "version", "volume-discounts", "vpg"},
 		},
 		{
 			input:    "s",
