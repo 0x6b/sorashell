@@ -226,6 +226,14 @@ func (suite *SoracomCompleterTestSuite) TestComplete() {
 			input:    "!",
 			expected: []string{},
 		},
+		{
+			input:    "subscribers list --speed-class-filter ",
+			expected: []string{"s1.minimum", "s1.slow", "s1.standard", "s1.fast", "s1.4xfast"},
+		},
+		{
+			input:    "subscribers list --tag-value-match-mode ",
+			expected: []string{"exact", "prefix"},
+		},
 	}
 
 	for _, t := range tests {

@@ -184,14 +184,31 @@ func paramSuggestions(params []param, param string) []gp.Suggest {
 			})
 		}
 		return gp.FilterFuzzy(r, param, true)
-	} else { // value suggestion
-		// get previous word
-		// if specific name is found, do more intelligent completion
-		// else get type for previous word
-		// if type is enum, provide possible values
-		// else do nothing
 	}
-	return []gp.Suggest{}
+	// value suggestion
+	// get previous word
+	// if specific name is found, do more intelligent completion
+	// else get type for previous word
+	// if type is enum, provide possible values
+	// else do nothing
+	return []gp.Suggest{
+		{
+			Text:        "s1.minimum",
+			Description: "",
+		},
+		{
+			Text:        "s1.slow",
+			Description: "",
+		},
+		{
+			Text:        "s1.standard",
+			Description: "",
+		},
+		{
+			Text:        "s1.fast",
+			Description: "",
+		},
+	}
 }
 
 // parse flags
