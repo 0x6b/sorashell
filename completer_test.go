@@ -173,7 +173,7 @@ func (suite *SoracomCompleterTestSuite) TestSearchParams() {
 	for _, t := range tests {
 		commands, flags := splitToCommandsAndFlags(t.input)
 		methods, _ := suite.completer.searchMethods(commands)
-		r, _ := suite.completer.searchParams(methods[0], flags)
+		r := suite.completer.searchParams(methods[0], flags)
 		suite.Equal(t.expected, r)
 	}
 }
