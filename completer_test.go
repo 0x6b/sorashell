@@ -15,7 +15,7 @@ func (suite *SoracomCompleterTestSuite) SetupTest() {
 	suite.completer = NewSoracomCompleter("/soracom-api.en.yaml")
 }
 
-func (suite *SoracomCompleterTestSuite) TestSplitToCommandsAndArgs() {
+func (suite *SoracomCompleterTestSuite) TestSplitToCommandsAndFlags() {
 	tests := []struct {
 		input    string
 		expected []string
@@ -42,7 +42,7 @@ func (suite *SoracomCompleterTestSuite) TestSplitToCommandsAndArgs() {
 	}
 }
 
-func (suite *SoracomCompleterTestSuite) TestArgsParser() {
+func (suite *SoracomCompleterTestSuite) TestParseFlags() {
 	tests := []struct {
 		input    string
 		expected []flag
@@ -84,7 +84,7 @@ func (suite *SoracomCompleterTestSuite) TestArgsParser() {
 	}
 }
 
-func (suite *SoracomCompleterTestSuite) TestGetParametersForCli() {
+func (suite *SoracomCompleterTestSuite) TestSearchParams() {
 	tests := []struct {
 		input    string
 		expected []param
@@ -172,7 +172,8 @@ func (suite *SoracomCompleterTestSuite) TestGetParametersForCli() {
 
 	for _, t := range tests {
 		commands, flags := splitToCommandsAndFlags(t.input)
-		r, _ := suite.completer.searchParams(commands, flags)
+		methods, _ := suite.completer.searchMethods(commands)
+		r := suite.completer.searchParams(methods[0], flags)
 		suite.Equal(t.expected, r)
 	}
 }
@@ -225,6 +226,14 @@ func (suite *SoracomCompleterTestSuite) TestComplete() {
 		{
 			input:    "!",
 			expected: []string{},
+		},
+		{
+			input:    "subscribers list --speed-class-filter ",
+			expected: []string{"s1.minimum", "s1.slow", "s1.standard", "s1.fast", "s1.4xfast"},
+		},
+		{
+			input:    "subscribers list --tag-value-match-mode ",
+			expected: []string{"exact", "prefix"},
 		},
 	}
 

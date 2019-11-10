@@ -46,9 +46,6 @@ func (s *SoracomCompleter) Complete(d gp.Document) []gp.Suggest {
 		if !found {
 			return []gp.Suggest{}
 		}
-		if len(methods) == 1 {
-			return commandSuggestion(methods[0], commands)
-		}
 		return commandSuggestions(methods, commands)
 	}
 
@@ -59,11 +56,8 @@ func (s *SoracomCompleter) Complete(d gp.Document) []gp.Suggest {
 			Description: "cannot find matching command",
 		}}
 	}
-	if params, found := s.searchParams(commands, flags); found {
-		return paramSuggestions(params, d.GetWordBeforeCursorWithSpace())
-	}
 
-	return []gp.Suggest{}
+	return paramSuggestions(methods[0], d.GetWordBeforeCursor(), flags)
 }
 
 // search API methods which has x-soracom-cli definition starts with given term
@@ -93,69 +87,28 @@ func (s *SoracomCompleter) searchMethods(term string) ([]sl.APIMethod, bool) {
 		return pickCliDefForPrefix(found[i].CLI, term) < pickCliDefForPrefix(found[j].CLI, term)
 	})
 
-	if len(found) == 0 {
-		return found, false
-	}
-	return found, true
-}
-
-// search parameters for cli definition
-func (s *SoracomCompleter) searchParams(commands, flags string) ([]param, bool) {
-	found := make([]param, 0)
-	parsedFlags := parseFlags(flags)
-
-	for _, method := range s.apiDef.Methods {
-		if method.CLI == nil || len(method.CLI) == 0 {
-			continue
-		}
-
-		for _, cli := range method.CLI {
-			if strings.Compare(cli, strings.TrimSpace(commands)) == 0 {
-				for _, p := range method.Parameters {
-					if !contains(parsedFlags, p.Name) {
-						found = append(found, param{
-							name:        strings.ReplaceAll(p.Name, "_", "-"),
-							required:    p.Required,
-							description: p.Description,
-							paramType:   p.Type,
-							enum:        p.Enum,
-						})
-					}
-				}
-			}
-		}
-	}
-
-	sort.Slice(found, func(i, j int) bool {
-		return found[i].name < found[j].name
-	})
-
-	if len(found) == 0 {
-		return found, false
-	}
-	return found, true
-}
-
-// return one command suggestion.
-func commandSuggestion(method sl.APIMethod, commands string) []gp.Suggest {
-	cli := pickCliDefForPrefix(method.CLI, commands)
-	n := strings.Count(commands, " ")
-
-	// return only text after current commands as suggestion e.g.
-	// - input:            "users password d"
-	// - match result:     "users password delete"
-	// - number of spaces: 2
-	// - returns:          "delete"
-	return []gp.Suggest{
-		{
-			Text:        strings.Join(strings.Split(cli, " ")[n:], " "),
-			Description: method.Summary,
-		},
-	}
+	return found, len(found) > 0
 }
 
 // return command suggestions.
 func commandSuggestions(methods []sl.APIMethod, commands string) []gp.Suggest {
+	if len(methods) == 1 {
+		cli := pickCliDefForPrefix(methods[0].CLI, commands)
+		n := strings.Count(commands, " ")
+
+		// return only text after current commands as suggestion e.g.
+		// - input:            "users password d"
+		// - match result:     "users password delete"
+		// - number of spaces: 2
+		// - returns:          "delete"
+		return []gp.Suggest{
+			{
+				Text:        strings.Join(strings.Split(cli, " ")[n:], " "),
+				Description: methods[0].Summary,
+			},
+		}
+	}
+
 	tmp := make(map[string]bool)
 	suggestions := make([]gp.Suggest, 0)
 	n := strings.Count(commands, " ")
@@ -174,30 +127,111 @@ func commandSuggestions(methods []sl.APIMethod, commands string) []gp.Suggest {
 	return suggestions
 }
 
-// return flag (name or value) suggestions.
-func paramSuggestions(params []param, param string) []gp.Suggest {
-	if strings.HasPrefix(param, "--") { // name suggestion
-		r := make([]gp.Suggest, 0)
-		for _, p := range params {
-			required := ""
-			if p.required {
-				required = "(required) "
-			}
+// search parameters for cli definition except already provided parameter
+func (s *SoracomCompleter) searchParams(method sl.APIMethod, flags string) []param {
+	found := make([]param, 0)
+	parsedFlags := parseFlags(flags)
 
-			r = append(r, gp.Suggest{
-				Text:        "--" + strings.ReplaceAll(p.name, "_", "-"),
-				Description: required + p.description,
+	for _, p := range method.Parameters {
+		if !contains(parsedFlags, p.Name) {
+			found = append(found, param{
+				name:        strings.ReplaceAll(p.Name, "_", "-"),
+				required:    p.Required,
+				description: p.Description,
+				paramType:   p.Type,
+				enum:        p.Enum,
 			})
 		}
-		return gp.FilterFuzzy(r, param, true)
-	} else { // value suggestion
-		// get previous word
-		// if specific name is found, do more intelligent completion
-		// else get type for previous word
-		// if type is enum, provide possible values
-		// else do nothing
 	}
-	return []gp.Suggest{}
+
+	sort.Slice(found, func(i, j int) bool {
+		return found[i].name < found[j].name
+	})
+
+	return found
+}
+
+// return flag (name or value) suggestions.
+func paramSuggestions(method sl.APIMethod, lastWord, flags string) []gp.Suggest {
+	params := make([]param, 0)
+	parsedFlags := parseFlags(flags)
+
+	for _, p := range method.Parameters {
+		params = append(params, param{
+			name:        strings.ReplaceAll(p.Name, "_", "-"),
+			required:    p.Required,
+			description: p.Description,
+			paramType:   p.Type,
+			enum:        p.Enum,
+		})
+	}
+
+	sort.Slice(params, func(i, j int) bool {
+		return params[i].name < params[j].name
+	})
+
+	// if last word is not a space, name suggestion
+	if lastWord != "" && strings.HasPrefix(flags, "--") {
+		r := make([]gp.Suggest, 0)
+		for _, p := range params {
+			if !contains(parsedFlags, p.name) {
+				required := ""
+				if p.required {
+					required = "(required) "
+				}
+
+				r = append(r, gp.Suggest{
+					Text:        "--" + strings.ReplaceAll(p.name, "_", "-"),
+					Description: required + p.description,
+				})
+			}
+		}
+		return gp.FilterFuzzy(r, lastWord, true)
+	}
+
+	// value suggestion
+	// use last flag from flags if param="" (not sure why d.GetWordBeforeCursor() returns "")
+	splitFlags := strings.Split(strings.TrimSpace(flags), " ")
+	lastFlag := strings.ReplaceAll(splitFlags[len(splitFlags)-1], "--", "")
+
+	// if type is enum, provide possible values
+	var suggests []gp.Suggest
+	for _, p := range params {
+		if p.name == lastFlag {
+			if len(p.enum) > 0 {
+				for _, e := range p.enum {
+					suggests = append(suggests, gp.Suggest{
+						Text:        e,
+						Description: "",
+					})
+				}
+			}
+		}
+	}
+
+	// if specific name is found, do more intelligent completion
+	switch lastFlag {
+	case "status-filter":
+		return []gp.Suggest{
+			{Text: "active", Description: ""},
+			{Text: "inactive", Description: ""},
+			{Text: "instock", Description: ""},
+			{Text: "ready", Description: ""},
+			{Text: "shipped", Description: ""},
+			{Text: "suspended", Description: ""},
+			{Text: "terminated", Description: ""},
+		}
+	case "speed-class-filter":
+		return []gp.Suggest{
+			{Text: "s1.minimum", Description: ""},
+			{Text: "s1.slow", Description: ""},
+			{Text: "s1.standard", Description: ""},
+			{Text: "s1.fast", Description: ""},
+			{Text: "s1.4xfast", Description: ""},
+		}
+	}
+
+	return suggests
 }
 
 // parse flags
