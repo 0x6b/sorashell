@@ -15,7 +15,7 @@ func (suite *SoracomCompleterTestSuite) SetupTest() {
 	suite.completer = NewSoracomCompleter("/soracom-api.en.yaml")
 }
 
-func (suite *SoracomCompleterTestSuite) TestSplitToCommandsAndArgs() {
+func (suite *SoracomCompleterTestSuite) TestSplitToCommandsAndFlags() {
 	tests := []struct {
 		input    string
 		expected []string
@@ -42,7 +42,7 @@ func (suite *SoracomCompleterTestSuite) TestSplitToCommandsAndArgs() {
 	}
 }
 
-func (suite *SoracomCompleterTestSuite) TestArgsParser() {
+func (suite *SoracomCompleterTestSuite) TestParseFlags() {
 	tests := []struct {
 		input    string
 		expected []flag
@@ -84,7 +84,7 @@ func (suite *SoracomCompleterTestSuite) TestArgsParser() {
 	}
 }
 
-func (suite *SoracomCompleterTestSuite) TestGetParametersForCli() {
+func (suite *SoracomCompleterTestSuite) TestSearchParams() {
 	tests := []struct {
 		input    string
 		expected []param
