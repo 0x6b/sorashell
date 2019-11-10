@@ -59,7 +59,7 @@ func (s *SoracomCompleter) Complete(d gp.Document) []gp.Suggest {
 			Description: "cannot find matching command",
 		}}
 	}
-	if params, found := s.searchParams(commands, flags); found {
+	if params, found := s.searchParams(methods, flags); found {
 		return paramSuggestions(params, d.GetWordBeforeCursorWithSpace())
 	}
 
@@ -97,28 +97,24 @@ func (s *SoracomCompleter) searchMethods(term string) ([]sl.APIMethod, bool) {
 }
 
 // search parameters for cli definition
-func (s *SoracomCompleter) searchParams(commands, flags string) ([]param, bool) {
+func (s *SoracomCompleter) searchParams(methods []sl.APIMethod, flags string) ([]param, bool) {
 	found := make([]param, 0)
 	parsedFlags := parseFlags(flags)
 
-	for _, method := range s.apiDef.Methods {
+	for _, method := range methods {
 		if method.CLI == nil || len(method.CLI) == 0 {
 			continue
 		}
 
-		for _, cli := range method.CLI {
-			if strings.Compare(cli, strings.TrimSpace(commands)) == 0 {
-				for _, p := range method.Parameters {
-					if !contains(parsedFlags, p.Name) {
-						found = append(found, param{
-							name:        strings.ReplaceAll(p.Name, "_", "-"),
-							required:    p.Required,
-							description: p.Description,
-							paramType:   p.Type,
-							enum:        p.Enum,
-						})
-					}
-				}
+		for _, p := range method.Parameters {
+			if !contains(parsedFlags, p.Name) {
+				found = append(found, param{
+					name:        strings.ReplaceAll(p.Name, "_", "-"),
+					required:    p.Required,
+					description: p.Description,
+					paramType:   p.Type,
+					enum:        p.Enum,
+				})
 			}
 		}
 	}
