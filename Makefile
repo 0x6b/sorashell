@@ -4,7 +4,7 @@ BIN_DOWNLOAD=download-assets
 ASSETS = assets/en.yaml assets/ja.yaml assets/soracom-api.en.yaml assets/soracom-api.ja.yaml
 STATIK = statik/statik.go
 
-$(BIN): clean $(STATIK)
+$(BIN): $(STATIK)
 	$(GO) build -o $(BIN) ./cmd/shell
 
 $(STATIK): $(ASSETS)
