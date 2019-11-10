@@ -46,9 +46,6 @@ func (s *SoracomCompleter) Complete(d gp.Document) []gp.Suggest {
 		if !found {
 			return []gp.Suggest{}
 		}
-		if len(methods) == 1 {
-			return commandSuggestion(methods[0], commands)
-		}
 		return commandSuggestions(methods, commands)
 	}
 
@@ -120,26 +117,25 @@ func (s *SoracomCompleter) searchParams(methods []sl.APIMethod, flags string) ([
 	return found, len(found) > 0
 }
 
-// return one command suggestion.
-func commandSuggestion(method sl.APIMethod, commands string) []gp.Suggest {
-	cli := pickCliDefForPrefix(method.CLI, commands)
-	n := strings.Count(commands, " ")
-
-	// return only text after current commands as suggestion e.g.
-	// - input:            "users password d"
-	// - match result:     "users password delete"
-	// - number of spaces: 2
-	// - returns:          "delete"
-	return []gp.Suggest{
-		{
-			Text:        strings.Join(strings.Split(cli, " ")[n:], " "),
-			Description: method.Summary,
-		},
-	}
-}
-
 // return command suggestions.
 func commandSuggestions(methods []sl.APIMethod, commands string) []gp.Suggest {
+	if len(methods) == 1 {
+		cli := pickCliDefForPrefix(methods[0].CLI, commands)
+		n := strings.Count(commands, " ")
+
+		// return only text after current commands as suggestion e.g.
+		// - input:            "users password d"
+		// - match result:     "users password delete"
+		// - number of spaces: 2
+		// - returns:          "delete"
+		return []gp.Suggest{
+			{
+				Text:        strings.Join(strings.Split(cli, " ")[n:], " "),
+				Description: methods[0].Summary,
+			},
+		}
+	}
+
 	tmp := make(map[string]bool)
 	suggestions := make([]gp.Suggest, 0)
 	n := strings.Count(commands, " ")
