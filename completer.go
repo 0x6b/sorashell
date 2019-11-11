@@ -131,14 +131,14 @@ func (s *SoracomCompleter) flagSuggestions(line string) []gp.Suggest {
 
 	if len(flagsArray) > 1 {
 		if strings.HasPrefix(flagsArray[len(flagsArray)-2], "--") &&
-			(strings.HasSuffix(line, " ") || !strings.HasSuffix(lastWord, "--")) {
+			(strings.HasSuffix(line, " ") || !strings.HasPrefix(lastWord, "--")) {
 			isEnteringFlag = false
 		}
 	}
 	if strings.HasSuffix(line, " ") {
 		isEnteringFlag = false
 	}
-	if len(flagsArray)%2 == 0 {
+	if len(flagsArray)%2 == 0 && !strings.HasPrefix(lastWord, "--") && strings.HasSuffix(line, " ") {
 		isEnteringFlag = true
 	}
 
