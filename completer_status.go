@@ -1,9 +1,9 @@
 package shell
 
-import "github.com/c-bata/go-prompt"
+import gp "github.com/c-bata/go-prompt"
 
-var statusFilterSuggestions = func(word string) []prompt.Suggest {
-	return filterFunc([]prompt.Suggest{
+var statusFilterSuggestions = func(word string) []gp.Suggest {
+	return filterFunc([]gp.Suggest{
 		{Text: "active", Description: ""},
 		{Text: "inactive", Description: ""},
 		{Text: "instock", Description: ""},
@@ -11,5 +11,5 @@ var statusFilterSuggestions = func(word string) []prompt.Suggest {
 		{Text: "shipped", Description: ""},
 		{Text: "suspended", Description: ""},
 		{Text: "terminated", Description: ""},
-	}, word, prompt.FilterFuzzy)
+	}, word, gp.FilterFuzzy)
 }
