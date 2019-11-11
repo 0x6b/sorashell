@@ -89,17 +89,32 @@ var getSubscribers = func(c chan<- []gp.Suggest) {
 	}
 	var r []gp.Suggest
 	for _, subscriber := range subscribers {
+		online := "offline"
+		if subscriber.SessionStatus.Online {
+			online = "online"
+		}
 		r = append(r, gp.Suggest{
 			Text: subscriber.Imsi,
-			Description: fmt.Sprintf("%s | %s | %t | %s | %s | %s",
-				subscriber.Subscription,
+			Description: fmt.Sprintf("%-12s | %-10s | %-7s | %-8s | %-11s | %s",
+				trunc(subscriber.Subscription, 14),
 				subscriber.Status,
-				subscriber.SessionStatus.Online,
+				online,
 				subscriber.ModuleType,
+				trunc(subscriber.SpeedClass, 11),
 				subscriber.Tags.Name,
-				subscriber.SpeedClass,
 			),
 		})
 	}
 	c <- r
+}
+
+func trunc(s string, n int) string {
+	r := s
+	if len(s) > n {
+		if n > 3 {
+			n -= 3
+		}
+		r = s[0:n] + "..."
+	}
+	return r
 }
