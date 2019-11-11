@@ -124,21 +124,20 @@ func (s *SoracomCompleter) flagSuggestions(line string) []gp.Suggest {
 		return params[i].name < params[j].name
 	})
 
-	parsedFlags := parseFlags(flags)
 	flagsArray := strings.Split(flags, " ")
 	lastWord := flagsArray[len(flagsArray)-1]
 	isEnteringFlag := true
 
 	if len(flagsArray) > 1 {
 		if strings.HasPrefix(flagsArray[len(flagsArray)-2], "--") &&
-			(strings.HasSuffix(line, " ") || !strings.HasSuffix(lastWord, "--")) {
+			(strings.HasSuffix(line, " ") || !strings.HasPrefix(lastWord, "--")) {
 			isEnteringFlag = false
 		}
 	}
 	if strings.HasSuffix(line, " ") {
 		isEnteringFlag = false
 	}
-	if len(flagsArray)%2 == 0 {
+	if len(flagsArray)%2 == 0 && !strings.HasPrefix(lastWord, "--") && strings.HasSuffix(line, " ") {
 		isEnteringFlag = true
 	}
 
@@ -156,7 +155,7 @@ func (s *SoracomCompleter) flagSuggestions(line string) []gp.Suggest {
 	if isEnteringFlag {
 		r := make([]gp.Suggest, 0)
 		for _, p := range params {
-			if !contains(parsedFlags, p.name) {
+			if !contains(parseFlags(flags), p.name) {
 				required := ""
 				if p.required {
 					required = "(required) "
@@ -171,7 +170,7 @@ func (s *SoracomCompleter) flagSuggestions(line string) []gp.Suggest {
 		return filterFunc(r, lastWord)
 	}
 
-	if strings.HasPrefix(flagsArray[len(flagsArray)-1], "--") {
+	if strings.HasPrefix(lastWord, "--") {
 		lastWord = ""
 	}
 
