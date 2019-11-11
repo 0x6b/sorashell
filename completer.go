@@ -24,7 +24,7 @@ func (s *SoracomCompleter) Complete(d gp.Document) []gp.Suggest {
 
 	// return from hard corded Commands as atm don't have a way to find top-level commands from API definition
 	if isFirstCommand(line) {
-		s := filterFunc(Commands, line)
+		s := filterFunc(Commands, line, gp.FilterFuzzy)
 		sort.Slice(s, func(i, j int) bool {
 			return s[i].Text < s[j].Text
 		})
@@ -167,7 +167,7 @@ func (s *SoracomCompleter) flagSuggestions(line string) []gp.Suggest {
 				})
 			}
 		}
-		return filterFunc(r, lastWord)
+		return filterFunc(r, lastWord, gp.FilterFuzzy)
 	}
 
 	if strings.HasPrefix(lastWord, "--") {
@@ -188,7 +188,7 @@ func (s *SoracomCompleter) flagSuggestions(line string) []gp.Suggest {
 				}
 			}
 			if len(suggests) > 0 {
-				return filterFunc(suggests, lastWord)
+				return filterFunc(suggests, lastWord, gp.FilterFuzzy)
 			}
 		}
 	}
@@ -196,9 +196,11 @@ func (s *SoracomCompleter) flagSuggestions(line string) []gp.Suggest {
 	// if specific name is found, do more intelligent completion
 	switch lastFlag {
 	case "status-filter":
-		return statusFilterFunc(lastWord)
+		return statusFilterSuggestions(lastWord)
 	case "speed-class-filter":
-		return speedClassFilterFunc(lastWord)
+		return speedClassFilterSuggestions(lastWord)
+	case "imsi":
+		return imsiFilterSuggestions(lastWord)
 	}
 
 	return suggests
@@ -302,28 +304,6 @@ func isFirstCommand(s string) bool {
 	return strings.TrimSpace(s) == "" || len(strings.Split(s, " ")) <= 1
 }
 
-var filterFunc = func(suggestions []gp.Suggest, word string) []gp.Suggest {
-	return gp.FilterFuzzy(suggestions, word, false)
-}
-
-var statusFilterFunc = func(word string) []gp.Suggest {
-	return filterFunc([]gp.Suggest{
-		{Text: "active", Description: ""},
-		{Text: "inactive", Description: ""},
-		{Text: "instock", Description: ""},
-		{Text: "ready", Description: ""},
-		{Text: "shipped", Description: ""},
-		{Text: "suspended", Description: ""},
-		{Text: "terminated", Description: ""},
-	}, word)
-}
-
-var speedClassFilterFunc = func(word string) []gp.Suggest {
-	return filterFunc([]gp.Suggest{
-		{Text: "s1.minimum", Description: ""},
-		{Text: "s1.slow", Description: ""},
-		{Text: "s1.standard", Description: ""},
-		{Text: "s1.fast", Description: ""},
-		{Text: "s1.4xfast", Description: ""},
-	}, word)
+var filterFunc = func(suggestions []gp.Suggest, word string, function func(completions []gp.Suggest, sub string, ignoreCase bool) []gp.Suggest) []gp.Suggest {
+	return function(suggestions, word, false)
 }
