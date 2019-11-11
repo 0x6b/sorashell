@@ -124,7 +124,6 @@ func (s *SoracomCompleter) flagSuggestions(line string) []gp.Suggest {
 		return params[i].name < params[j].name
 	})
 
-	parsedFlags := parseFlags(flags)
 	flagsArray := strings.Split(flags, " ")
 	lastWord := flagsArray[len(flagsArray)-1]
 	isEnteringFlag := true
@@ -156,7 +155,7 @@ func (s *SoracomCompleter) flagSuggestions(line string) []gp.Suggest {
 	if isEnteringFlag {
 		r := make([]gp.Suggest, 0)
 		for _, p := range params {
-			if !contains(parsedFlags, p.name) {
+			if !contains(parseFlags(flags), p.name) {
 				required := ""
 				if p.required {
 					required = "(required) "
