@@ -78,13 +78,19 @@ func (s *SoracomCompleter) commandSuggestion(commands string) []gp.Suggest {
 
 	// filter duplicates
 	for _, apiMethod := range methods {
-		cli := strings.Split(pickCliDefForPrefix(apiMethod.CLI, commands), " ")[n]
-		if !tmp[cli] {
-			tmp[cli] = true
-			suggestions = append(suggestions, gp.Suggest{
-				Text:        cli,
-				Description: apiMethod.Summary,
-			})
+		// Sometimes two are two candidates which causes oob access.
+		//   - query subscribers
+		//   - query subscribers traffic_volume
+		cli := strings.Split(pickCliDefForPrefix(apiMethod.CLI, commands), " ")
+		if len(cli) > n {
+			cli := cli[n]
+			if !tmp[cli] {
+				tmp[cli] = true
+				suggestions = append(suggestions, gp.Suggest{
+					Text:        cli,
+					Description: apiMethod.Summary,
+				})
+			}
 		}
 	}
 
