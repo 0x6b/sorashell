@@ -20,3 +20,48 @@ type param struct {
 	paramType   string
 	enum        []string
 }
+
+var subscribers []struct {
+	Apn              string      `json:"apn"`
+	CreatedAt        int64       `json:"createdAt"`
+	CreatedTime      int64       `json:"createdTime"`
+	ExpiredAt        interface{} `json:"expiredAt"`
+	ExpiryAction     interface{} `json:"expiryAction"`
+	ExpiryTime       interface{} `json:"expiryTime"`
+	GroupID          string      `json:"groupId"`
+	Iccid            string      `json:"iccid"`
+	ImeiLock         interface{} `json:"imeiLock"`
+	Imsi             string      `json:"imsi"`
+	IPAddress        string      `json:"ipAddress"`
+	LastModifiedAt   int64       `json:"lastModifiedAt"`
+	LastModifiedTime int64       `json:"lastModifiedTime"`
+	ModuleType       string      `json:"moduleType"`
+	Msisdn           string      `json:"msisdn"`
+	OperatorID       string      `json:"operatorId"`
+	Plan             int         `json:"plan"`
+	RegisteredTime   int64       `json:"registeredTime"`
+	SerialNumber     string      `json:"serialNumber"`
+	SessionStatus    struct {
+		Cell struct {
+			Eci       int    `json:"eci"`
+			Mcc       int    `json:"mcc"`
+			Mnc       int    `json:"mnc"`
+			RadioType string `json:"radioType"`
+			Tac       int    `json:"tac"`
+		} `json:"cell"`
+		DNSServers    []string    `json:"dnsServers"`
+		Imei          string      `json:"imei"`
+		LastUpdatedAt int64       `json:"lastUpdatedAt"`
+		Location      interface{} `json:"location"`
+		Online        bool        `json:"online"`
+		UeIPAddress   string      `json:"ueIpAddress"`
+	} `json:"sessionStatus"`
+	SpeedClass   string `json:"speedClass"`
+	Status       string `json:"status"`
+	Subscription string `json:"subscription"`
+	Tags         struct {
+		Name string `json:"name"`
+	} `json:"tags"`
+	TerminationEnabled bool   `json:"terminationEnabled"`
+	Type               string `json:"type"`
+}
