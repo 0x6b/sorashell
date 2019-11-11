@@ -170,7 +170,7 @@ func (s *SoracomCompleter) flagSuggestions(line string) []gp.Suggest {
 		return filterFunc(r, lastWord)
 	}
 
-	if strings.HasPrefix(flagsArray[len(flagsArray)-1], "--") {
+	if strings.HasPrefix(lastWord, "--") {
 		lastWord = ""
 	}
 
