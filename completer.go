@@ -24,7 +24,7 @@ func (s *SoracomCompleter) Complete(d gp.Document) []gp.Suggest {
 
 	// return from hard corded Commands as atm don't have a way to find top-level commands from API definition
 	if isFirstCommand(line) {
-		s := gp.FilterFuzzy(Commands, line, true)
+		s := filterFunc(Commands, line)
 		sort.Slice(s, func(i, j int) bool {
 			return s[i].Text < s[j].Text
 		})
@@ -168,7 +168,7 @@ func (s *SoracomCompleter) flagSuggestions(line string) []gp.Suggest {
 				})
 			}
 		}
-		return gp.FilterFuzzy(r, lastWord, true)
+		return filterFunc(r, lastWord)
 	}
 
 	if strings.HasPrefix(flagsArray[len(flagsArray)-1], "--") {
@@ -189,7 +189,7 @@ func (s *SoracomCompleter) flagSuggestions(line string) []gp.Suggest {
 				}
 			}
 			if len(suggests) > 0 {
-				return gp.FilterFuzzy(suggests, lastWord, false)
+				return filterFunc(suggests, lastWord)
 			}
 		}
 	}
@@ -197,23 +197,9 @@ func (s *SoracomCompleter) flagSuggestions(line string) []gp.Suggest {
 	// if specific name is found, do more intelligent completion
 	switch lastFlag {
 	case "status-filter":
-		return gp.FilterFuzzy([]gp.Suggest{
-			{Text: "active", Description: ""},
-			{Text: "inactive", Description: ""},
-			{Text: "instock", Description: ""},
-			{Text: "ready", Description: ""},
-			{Text: "shipped", Description: ""},
-			{Text: "suspended", Description: ""},
-			{Text: "terminated", Description: ""},
-		}, lastWord, false)
+		return statusFilterFunc(lastWord)
 	case "speed-class-filter":
-		return gp.FilterFuzzy([]gp.Suggest{
-			{Text: "s1.minimum", Description: ""},
-			{Text: "s1.slow", Description: ""},
-			{Text: "s1.standard", Description: ""},
-			{Text: "s1.fast", Description: ""},
-			{Text: "s1.4xfast", Description: ""},
-		}, lastWord, false)
+		return speedClassFilterFunc(lastWord)
 	}
 
 	return suggests
@@ -315,4 +301,30 @@ func endsWithPipeOrRedirect(s string) bool {
 
 func isFirstCommand(s string) bool {
 	return strings.TrimSpace(s) == "" || len(strings.Split(s, " ")) <= 1
+}
+
+var filterFunc = func(suggestions []gp.Suggest, word string) []gp.Suggest {
+	return gp.FilterFuzzy(suggestions, word, false)
+}
+
+var statusFilterFunc = func(word string) []gp.Suggest {
+	return filterFunc([]gp.Suggest{
+		{Text: "active", Description: ""},
+		{Text: "inactive", Description: ""},
+		{Text: "instock", Description: ""},
+		{Text: "ready", Description: ""},
+		{Text: "shipped", Description: ""},
+		{Text: "suspended", Description: ""},
+		{Text: "terminated", Description: ""},
+	}, word)
+}
+
+var speedClassFilterFunc = func(word string) []gp.Suggest {
+	return filterFunc([]gp.Suggest{
+		{Text: "s1.minimum", Description: ""},
+		{Text: "s1.slow", Description: ""},
+		{Text: "s1.standard", Description: ""},
+		{Text: "s1.fast", Description: ""},
+		{Text: "s1.4xfast", Description: ""},
+	}, word)
 }
