@@ -1,16 +1,12 @@
 package shell
 
 import (
-	"encoding/json"
-	"fmt"
 	gp "github.com/c-bata/go-prompt"
 	sl "github.com/soracom/soracom-cli/generators/lib"
 	_ "github.com/soracom/soracom-shell/statik"
 	"log"
-	"os/exec"
 	"sort"
 	"strings"
-	"time"
 )
 
 // NewSoracomCompleter returns a SoracomCompleter which is based on  api definition loaded from given apiDefPath.
@@ -200,11 +196,11 @@ func (s *SoracomCompleter) flagSuggestions(line string) []gp.Suggest {
 	// if specific name is found, do more intelligent completion
 	switch lastFlag {
 	case "status-filter":
-		return statusFilterFunc(lastWord)
+		return statusFilterSuggestions(lastWord)
 	case "speed-class-filter":
-		return speedClassFilterFunc(lastWord)
+		return speedClassFilterSuggestions(lastWord)
 	case "imsi":
-		return imsiFilterFunc(lastWord)
+		return imsiFilterSuggestions(lastWord)
 	}
 
 	return suggests
@@ -310,118 +306,4 @@ func isFirstCommand(s string) bool {
 
 var filterFunc = func(suggestions []gp.Suggest, word string, function func(completions []gp.Suggest, sub string, ignoreCase bool) []gp.Suggest) []gp.Suggest {
 	return function(suggestions, word, false)
-}
-
-var statusFilterFunc = func(word string) []gp.Suggest {
-	return filterFunc([]gp.Suggest{
-		{Text: "active", Description: ""},
-		{Text: "inactive", Description: ""},
-		{Text: "instock", Description: ""},
-		{Text: "ready", Description: ""},
-		{Text: "shipped", Description: ""},
-		{Text: "suspended", Description: ""},
-		{Text: "terminated", Description: ""},
-	}, word, gp.FilterFuzzy)
-}
-
-var speedClassFilterFunc = func(word string) []gp.Suggest {
-	return filterFunc([]gp.Suggest{
-		{Text: "s1.minimum", Description: ""},
-		{Text: "s1.slow", Description: ""},
-		{Text: "s1.standard", Description: ""},
-		{Text: "s1.fast", Description: ""},
-		{Text: "s1.4xfast", Description: ""},
-	}, word, gp.FilterFuzzy)
-}
-
-var cache []gp.Suggest
-var imsiFilterFunc = func(word string) []gp.Suggest {
-	c := make(chan []gp.Suggest, 1024)
-	if len(cache) == 0 {
-		go getSubscribers(c)
-		select {
-		case res := <-c:
-			cache = res
-		case <-time.After(10 * time.Second):
-		}
-	}
-	return filterFunc(cache, word, filterTextOrDescriptionFuzzy)
-}
-
-// filter by text or description based on
-// https://github.com/c-bata/go-prompt/blob/f350bee28f376e06a9877a516ac4eabe01804013/filter.go#L31 (MIT)
-var filterTextOrDescriptionFuzzy = func(suggestions []gp.Suggest, sub string, ignoreCase bool) []gp.Suggest {
-	if sub == "" {
-		return suggestions
-	}
-	if ignoreCase {
-		sub = strings.ToUpper(sub)
-	}
-
-	ret := make([]gp.Suggest, 0, len(suggestions))
-	for i := range suggestions {
-		t := suggestions[i].Text
-		d := suggestions[i].Description
-		if ignoreCase {
-			t = strings.ToUpper(t)
-			d = strings.ToUpper(d)
-		}
-		if fuzzyMatch(t, sub) || fuzzyMatch(d, sub) {
-			ret = append(ret, suggestions[i])
-		}
-	}
-	return ret
-}
-
-func fuzzyMatch(s, sub string) bool {
-	sChars := []rune(s)
-	subChars := []rune(sub)
-	sIdx := 0
-
-	for _, c := range subChars {
-		found := false
-		for ; sIdx < len(sChars); sIdx++ {
-			if sChars[sIdx] == c {
-				found = true
-				sIdx++
-				break
-			}
-		}
-		if !found {
-			return false
-		}
-	}
-	return true
-}
-
-var getSubscribers = func(c chan<- []gp.Suggest) {
-	cmd := exec.Command("/bin/sh", "-c", "soracom subscribers list")
-	stdout, err := cmd.StdoutPipe()
-	if err != nil {
-		log.Fatal(err)
-	}
-	if err := cmd.Start(); err != nil {
-		log.Fatal(err)
-	}
-	if err := json.NewDecoder(stdout).Decode(&subscribers); err != nil {
-		log.Fatal(err)
-	}
-	if err := cmd.Wait(); err != nil {
-		log.Fatal(err)
-	}
-	var r []gp.Suggest
-	for _, subscriber := range subscribers {
-		r = append(r, gp.Suggest{
-			Text: subscriber.Imsi,
-			Description: fmt.Sprintf("%s | %s | %t | %s | %s | %s",
-				subscriber.Subscription,
-				subscriber.Status,
-				subscriber.SessionStatus.Online,
-				subscriber.ModuleType,
-				subscriber.Tags.Name,
-				subscriber.SpeedClass,
-			),
-		})
-	}
-	c <- r
 }
