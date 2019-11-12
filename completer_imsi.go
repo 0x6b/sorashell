@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	gp "github.com/c-bata/go-prompt"
-	"log"
 	"os/exec"
 	"strings"
 	"time"
@@ -71,21 +70,21 @@ func fuzzyMatch(s, sub string) bool {
 }
 
 var getSubscribers = func(c chan<- []gp.Suggest) {
+	var r []gp.Suggest
 	cmd := exec.Command("/bin/sh", "-c", "soracom subscribers list --fetch-all")
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		log.Fatal(err)
+		c <- r
 	}
 	if err := cmd.Start(); err != nil {
-		log.Fatal(err)
+		c <- r
 	}
 	if err := json.NewDecoder(stdout).Decode(&subscribers); err != nil {
-		log.Fatal(err)
+		c <- r
 	}
 	if err := cmd.Wait(); err != nil {
-		log.Fatal(err)
+		c <- r
 	}
-	var r []gp.Suggest
 	for _, subscriber := range subscribers {
 		online := "offline"
 		if subscriber.SessionStatus.Online {
