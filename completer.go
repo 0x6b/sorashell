@@ -155,14 +155,14 @@ func (s *SoracomCompleter) flagSuggestions(line string) []gp.Suggest {
 	if isEnteringFlag {
 		r := make([]gp.Suggest, 0)
 		for _, p := range params {
-			if !contains(parseFlags(flags), p.name) {
+			if !contains(parseFlags(flags), sl.OptionCase(p.name)) {
 				required := ""
 				if p.required {
 					required = "(required) "
 				}
 
 				r = append(r, gp.Suggest{
-					Text:        "--" + strings.ReplaceAll(p.name, "_", "-"),
+					Text:        "--" + sl.OptionCase(p.name),
 					Description: required + p.description,
 				})
 			}
