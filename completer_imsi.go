@@ -71,7 +71,7 @@ func fuzzyMatch(s, sub string) bool {
 }
 
 var getSubscribers = func(c chan<- []gp.Suggest) {
-	cmd := exec.Command("/bin/sh", "-c", "soracom subscribers list")
+	cmd := exec.Command("/bin/sh", "-c", "soracom subscribers list --fetch-all")
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		log.Fatal(err)
