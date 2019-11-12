@@ -38,13 +38,11 @@ var filterTextOrDescriptionFuzzy = func(suggestions []gp.Suggest, sub string, ig
 
 	ret := make([]gp.Suggest, 0, len(suggestions))
 	for i := range suggestions {
-		t := suggestions[i].Text
-		d := suggestions[i].Description
+		c := suggestions[i].Text + " " + suggestions[i].Description
 		if ignoreCase {
-			t = strings.ToUpper(t)
-			d = strings.ToUpper(d)
+			c = strings.ToUpper(c)
 		}
-		if fuzzyMatch(t, sub) || fuzzyMatch(d, sub) {
+		if fuzzyMatch(c, sub) {
 			ret = append(ret, suggestions[i])
 		}
 	}
