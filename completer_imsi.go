@@ -20,6 +20,10 @@ var imsiFilterSuggestions = func(word string) []gp.Suggest {
 		case res := <-c:
 			cache = res
 		case <-time.After(10 * time.Second):
+			return []gp.Suggest{{
+				Text:        "Downloading IMSI in background",
+				Description: "Hit space to see latest",
+			}}
 		}
 	}
 	return filterFunc(cache, word, filterTextOrDescriptionFuzzy)
