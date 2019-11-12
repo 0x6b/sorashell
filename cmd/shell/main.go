@@ -20,10 +20,19 @@ __)\_/| \/--\\_\_/|  | __)| ||_ |_|_
 		completer.Complete,
 		gp.OptionTitle("SORACOM Shell"),
 		gp.OptionPrefix("SORACOM> "),
-		gp.OptionMaxSuggestion(10),
+		gp.OptionMaxSuggestion(5),
+
+		gp.OptionSuggestionBGColor(gp.Turquoise),
+		gp.OptionSuggestionTextColor(gp.Black),
+		gp.OptionDescriptionBGColor(gp.LightGray),
+		gp.OptionDescriptionTextColor(gp.Black),
+
+		gp.OptionSelectedSuggestionBGColor(gp.DarkGray),
+		gp.OptionSelectedSuggestionTextColor(gp.White),
+		gp.OptionSelectedDescriptionBGColor(gp.DarkGray),
+		gp.OptionSelectedDescriptionTextColor(gp.White),
+
 		gp.OptionPrefixTextColor(gp.Cyan),
 		gp.OptionPreviewSuggestionTextColor(gp.Blue),
-		gp.OptionSelectedSuggestionBGColor(gp.LightGray),
-		gp.OptionSuggestionBGColor(gp.DarkGray),
 	).Run()
 }

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	gp "github.com/c-bata/go-prompt"
-	"log"
 	"os/exec"
 	"strings"
 	"time"
@@ -21,6 +20,10 @@ var imsiFilterSuggestions = func(word string) []gp.Suggest {
 		case res := <-c:
 			cache = res
 		case <-time.After(10 * time.Second):
+			return []gp.Suggest{{
+				Text:        "Downloading IMSI in background",
+				Description: "Hit space to see latest",
+			}}
 		}
 	}
 	return filterFunc(cache, word, filterTextOrDescriptionFuzzy)
@@ -38,13 +41,11 @@ var filterTextOrDescriptionFuzzy = func(suggestions []gp.Suggest, sub string, ig
 
 	ret := make([]gp.Suggest, 0, len(suggestions))
 	for i := range suggestions {
-		t := suggestions[i].Text
-		d := suggestions[i].Description
+		c := suggestions[i].Text + " " + suggestions[i].Description
 		if ignoreCase {
-			t = strings.ToUpper(t)
-			d = strings.ToUpper(d)
+			c = strings.ToUpper(c)
 		}
-		if fuzzyMatch(t, sub) || fuzzyMatch(d, sub) {
+		if fuzzyMatch(c, sub) {
 			ret = append(ret, suggestions[i])
 		}
 	}
@@ -73,21 +74,21 @@ func fuzzyMatch(s, sub string) bool {
 }
 
 var getSubscribers = func(c chan<- []gp.Suggest) {
-	cmd := exec.Command("/bin/sh", "-c", "soracom subscribers list")
+	var r []gp.Suggest
+	cmd := exec.Command("/bin/sh", "-c", "soracom subscribers list --fetch-all")
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		log.Fatal(err)
+		c <- r
 	}
 	if err := cmd.Start(); err != nil {
-		log.Fatal(err)
+		c <- r
 	}
 	if err := json.NewDecoder(stdout).Decode(&subscribers); err != nil {
-		log.Fatal(err)
+		c <- r
 	}
 	if err := cmd.Wait(); err != nil {
-		log.Fatal(err)
+		c <- r
 	}
-	var r []gp.Suggest
 	for _, subscriber := range subscribers {
 		online := "offline"
 		if subscriber.SessionStatus.Online {
