@@ -305,5 +305,5 @@ func isFirstCommand(s string) bool {
 }
 
 var filterFunc = func(suggestions []gp.Suggest, word string, function func(completions []gp.Suggest, sub string, ignoreCase bool) []gp.Suggest) []gp.Suggest {
-	return function(suggestions, word, false)
+	return function(suggestions, word, true)
 }
