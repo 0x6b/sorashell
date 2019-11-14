@@ -5,9 +5,12 @@ import (
 	sl "github.com/soracom/soracom-cli/generators/lib"
 	_ "github.com/soracom/soracom-shell/statik"
 	"log"
+	"regexp"
 	"sort"
 	"strings"
 )
+
+var multipleSpaces = regexp.MustCompile(`\s+`)
 
 // NewSoracomCompleter returns a SoracomCompleter which is based on  api definition loaded from given apiDefPath.
 func NewSoracomCompleter(apiDefPath string) *SoracomCompleter {
@@ -39,6 +42,7 @@ func (s *SoracomCompleter) Complete(d gp.Document) []gp.Suggest {
 }
 
 func (s *SoracomCompleter) findSuggestions(line string) []gp.Suggest {
+	line = multipleSpaces.ReplaceAllString(line, " ")
 	commands, flags := splitToCommandsAndFlags(line)
 	if len(flags) == 0 {
 		return s.commandSuggestion(commands)
