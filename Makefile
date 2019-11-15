@@ -1,6 +1,6 @@
 GO=go
 BIN=soracom-shell
-SRC= *.go cmd/shell/*.go
+SRC= *.go cmd/*.go cmd/shell/*.go
 BIN_DOWNLOAD=download-assets
 ASSETS = assets/en.yaml assets/ja.yaml assets/soracom-api.en.yaml assets/soracom-api.ja.yaml
 STATIK = statik/statik.go

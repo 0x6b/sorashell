@@ -10,12 +10,22 @@ import (
 // SoracomExecutor executes given string with the shell.
 type SoracomExecutor struct {
 	// shell which executes a command
-	shell string
+	shell                 string
+	specifiedProfileName  string
+	specifiedCoverageType string
+	providedAPIKey        string
+	providedAPIToken      string
 }
 
 // NewSoracomExecutor returns a SoracomExecutor which executes commands with shell.
-func NewSoracomExecutor(shell string) *SoracomExecutor {
-	return &SoracomExecutor{shell}
+func NewSoracomExecutor(shell, specifiedProfileName, specifiedCoverageType, providedAPIKey, providedAPIToken string) *SoracomExecutor {
+	return &SoracomExecutor{
+		shell,
+		specifiedProfileName,
+		specifiedCoverageType,
+		providedAPIKey,
+		providedAPIToken,
+	}
 }
 
 // Execute executes given string in the shell.
@@ -43,7 +53,20 @@ func (e *SoracomExecutor) Execute(s string) {
 	if strings.HasPrefix(s, "!") {
 		cmd = exec.Command("/bin/sh", "-c", strings.TrimPrefix(s, "!"))
 	} else {
-		cmd = exec.Command("/bin/sh", "-c", "soracom "+s)
+		command := "soracom "
+		if e.specifiedCoverageType != "" {
+			command = fmt.Sprintf("%s --coverage-type %s ", command, e.specifiedCoverageType)
+		}
+		if e.specifiedProfileName != "" {
+			command = fmt.Sprintf("%s --profile %s ", command, e.specifiedCoverageType)
+		}
+		if e.providedAPIKey != "" {
+			command = fmt.Sprintf("%s --api-key %s ", command, e.providedAPIKey)
+		}
+		if e.providedAPIToken != "" {
+			command = fmt.Sprintf("%s --api-token %s ", command, e.providedAPIToken)
+		}
+		cmd = exec.Command("/bin/sh", "-c", command+s)
 	}
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
