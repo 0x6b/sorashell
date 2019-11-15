@@ -13,12 +13,18 @@ import (
 var multipleSpaces = regexp.MustCompile(`\s+`)
 
 // NewSoracomCompleter returns a SoracomCompleter which is based on  api definition loaded from given apiDefPath.
-func NewSoracomCompleter(apiDefPath string) *SoracomCompleter {
+func NewSoracomCompleter(apiDefPath, specifiedProfileName, specifiedCoverageType, providedAPIKey, providedAPIToken string) *SoracomCompleter {
 	apiDef, err := loadAPIDef(apiDefPath)
 	if err != nil {
 		log.Fatalf("%+v\n", err)
 	}
-	return &SoracomCompleter{apiDef}
+	return &SoracomCompleter{
+		apiDef,
+		specifiedProfileName,
+		specifiedCoverageType,
+		providedAPIKey,
+		providedAPIToken,
+	}
 }
 
 // Complete returns suggestions for given Document.
@@ -204,7 +210,7 @@ func (s *SoracomCompleter) flagSuggestions(line string) []gp.Suggest {
 	case "speed-class-filter":
 		return speedClassFilterSuggestions(lastWord)
 	case "imsi":
-		return imsiFilterSuggestions(lastWord)
+		return imsiFilterSuggestions(lastWord, s.specifiedProfileName, s.specifiedCoverageType, s.providedAPIKey, s.providedAPIToken)
 	}
 
 	return suggests

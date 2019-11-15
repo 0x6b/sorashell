@@ -25,7 +25,7 @@ var RootCmd = &cobra.Command{
 	Long:  "Interactive shell for SORACOM CLI",
 	Run: func(cmd *cobra.Command, args []string) {
 		executor := shell.NewSoracomExecutor("/bin/sh", specifiedProfileName, specifiedCoverageType, providedAPIKey, providedAPIToken)
-		completer := shell.NewSoracomCompleter("/soracom-api.en.yaml")
+		completer := shell.NewSoracomCompleter("/soracom-api.en.yaml", specifiedProfileName, specifiedCoverageType, providedAPIKey, providedAPIToken)
 
 		fmt.Print(` _  _  _      _ _       _     _    
 (_ / \|_) /\ / / \|\/| (_ |_||_ | | 

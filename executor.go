@@ -7,16 +7,6 @@ import (
 	"strings"
 )
 
-// SoracomExecutor executes given string with the shell.
-type SoracomExecutor struct {
-	// shell which executes a command
-	shell                 string
-	specifiedProfileName  string
-	specifiedCoverageType string
-	providedAPIKey        string
-	providedAPIToken      string
-}
-
 // NewSoracomExecutor returns a SoracomExecutor which executes commands with shell.
 func NewSoracomExecutor(shell, specifiedProfileName, specifiedCoverageType, providedAPIKey, providedAPIToken string) *SoracomExecutor {
 	return &SoracomExecutor{
@@ -54,11 +44,11 @@ func (e *SoracomExecutor) Execute(s string) {
 		cmd = exec.Command("/bin/sh", "-c", strings.TrimPrefix(s, "!"))
 	} else {
 		command := "soracom "
+		if e.specifiedProfileName != "" {
+			command = fmt.Sprintf("%s --profile %s ", command, e.specifiedProfileName)
+		}
 		if e.specifiedCoverageType != "" {
 			command = fmt.Sprintf("%s --coverage-type %s ", command, e.specifiedCoverageType)
-		}
-		if e.specifiedProfileName != "" {
-			command = fmt.Sprintf("%s --profile %s ", command, e.specifiedCoverageType)
 		}
 		if e.providedAPIKey != "" {
 			command = fmt.Sprintf("%s --api-key %s ", command, e.providedAPIKey)

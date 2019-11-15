@@ -12,10 +12,10 @@ import (
 // naive cache which holds subscribers data for imsiFilterSuggestions
 var cache []gp.Suggest
 
-var imsiFilterSuggestions = func(word string) []gp.Suggest {
+var imsiFilterSuggestions = func(word, specifiedProfileName, specifiedCoverageType, providedAPIKey, providedAPIToken string) []gp.Suggest {
 	c := make(chan []gp.Suggest, 1024)
 	if len(cache) == 0 {
-		go getSubscribers(c)
+		go getSubscribers(c, specifiedProfileName, specifiedCoverageType, providedAPIKey, providedAPIToken)
 		select {
 		case res := <-c:
 			cache = res
@@ -73,21 +73,48 @@ func fuzzyMatch(s, sub string) bool {
 	return true
 }
 
-var getSubscribers = func(c chan<- []gp.Suggest) {
+var getSubscribers = func(c chan<- []gp.Suggest, specifiedProfileName, specifiedCoverageType, providedAPIKey, providedAPIToken string) {
 	var r []gp.Suggest
-	cmd := exec.Command("/bin/sh", "-c", "soracom subscribers list --fetch-all")
+	command := "soracom "
+	if specifiedProfileName != "" {
+		command = fmt.Sprintf("%s --profile %s ", command, specifiedProfileName)
+	}
+	if specifiedCoverageType != "" {
+		command = fmt.Sprintf("%s --coverage-type %s ", command, specifiedCoverageType)
+	}
+	if providedAPIKey != "" {
+		command = fmt.Sprintf("%s --api-key %s ", command, providedAPIKey)
+	}
+	if providedAPIToken != "" {
+		command = fmt.Sprintf("%s --api-token %s ", command, providedAPIToken)
+	}
+	command = fmt.Sprintf("%s subscribers list --fetch-all", command)
+	cmd := exec.Command("/bin/sh", "-c", command)
+	//cmd := exec.Command("/bin/sh", "-c", "soracom subscribers list --fetch-all")
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		c <- r
+		c <- []gp.Suggest{{
+			Text:        "Error " + command,
+			Description: err.Error(),
+		}}
 	}
 	if err := cmd.Start(); err != nil {
-		c <- r
+		c <- []gp.Suggest{{
+			Text:        "Error " + command,
+			Description: err.Error(),
+		}}
 	}
 	if err := json.NewDecoder(stdout).Decode(&subscribers); err != nil {
-		c <- r
+		c <- []gp.Suggest{{
+			Text:        "Error " + command,
+			Description: err.Error(),
+		}}
 	}
 	if err := cmd.Wait(); err != nil {
-		c <- r
+		c <- []gp.Suggest{{
+			Text:        "Error " + command,
+			Description: err.Error(),
+		}}
 	}
 	for _, subscriber := range subscribers {
 		online := "offline"
