@@ -14,7 +14,7 @@ Interactive shell for [`soracom-cli`](https://github.com/soracom/soracom-cli/). 
 1. Install and configure `soracom-cli` according to the repo's README
 2. Run `soracom-shell`
 3. The shell automatically provides suggestions as you type. Enjoy!
-    - <kbd>Tab</kbd> to move cursor
+    - <kbd>Tab</kbd> to move cursor or display suggestions
     - <kbd>Space</kbd> to select
 
 ## Development
@@ -35,6 +35,10 @@ $ make soracom-shell
 ```console
 $ make test
 ```
+
+## Limitation
+
+- macOS only at this moment
 
 ## Acknowledgements
 
