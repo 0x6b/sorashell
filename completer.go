@@ -245,6 +245,7 @@ func (s *SoracomCompleter) flagSuggestions(line string) []gp.Suggest {
 	case "speed-class-filter":
 		return speedClassFilterSuggestions(lastWord)
 	case "imsi":
+	case "resource-id": // `logs get` or `audit-logs napter get` uses 'resource-id' for imsi
 		return imsiFilterSuggestions(lastWord, s.specifiedProfileName, s.specifiedCoverageType, s.providedAPIKey, s.providedAPIToken)
 	}
 
