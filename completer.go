@@ -75,6 +75,7 @@ func (s *SoracomCompleter) Complete(d gp.Document) []gp.Suggest {
 func (s *SoracomCompleter) findSuggestions(line string) []gp.Suggest {
 	line = multipleSpaces.ReplaceAllString(line, " ")
 	commands, flags := splitToCommandsAndFlags(line)
+
 	if len(flags) == 0 {
 		return s.commandSuggestion(commands)
 	}
@@ -134,7 +135,7 @@ func (s *SoracomCompleter) commandSuggestion(commands string) []gp.Suggest {
 
 // return flag (name or value) suggestions.
 func (s *SoracomCompleter) flagSuggestions(line string) []gp.Suggest {
-	commands, flags := splitToCommandsAndFlags(line)
+	commands, flags := splitToCommandsAndFlags(line) // split again...
 	methods, found := s.searchMethods(commands)
 	if !found || len(methods) != 1 {
 		return []gp.Suggest{{
@@ -194,8 +195,6 @@ func (s *SoracomCompleter) flagSuggestions(line string) []gp.Suggest {
 			break
 		}
 	}
-	//fmt.Printf("\n----------\n- line: '%s'\n- parsedFlags: %+v\n- flagsArray: %+v\n- lastFlag: %s\n- lastWord: %s\n- isEnteringFlag: %t\n",
-	//	line, parsedFlags, flagsArray, lastFlag, lastWord, isEnteringFlag)
 
 	// provide flag name suggestion if user is entering flag
 	if isEnteringFlag {
