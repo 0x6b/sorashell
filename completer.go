@@ -11,6 +11,31 @@ import (
 )
 
 var multipleSpaces = regexp.MustCompile(`\s+`)
+var commandsWithFetchAll = []string{"audit-logs napter get",
+	"data get",
+	"data get-entries",
+	"data list-source-resources",
+	"devices get-data",
+	"devices list",
+	"devices list-object-models",
+	"gadgets list",
+	"groups list",
+	"groups list-subscribers",
+	"logs get",
+	"lora-devices get-data",
+	"lora-devices list",
+	"lora-gateway list",
+	"lora-network-sets list",
+	"lora-network-sets list-gateways",
+	"port-mappings list",
+	"query sigfox-devices",
+	"query subscribers",
+	"sigfox-devices get-data",
+	"sigfox-devices list",
+	"subscribers get-data",
+	"subscribers list",
+	"subscribers session-events",
+	"vpg list"}
 
 // NewSoracomCompleter returns a SoracomCompleter which is based on  api definition loaded from given apiDefPath.
 func NewSoracomCompleter(apiDefPath, specifiedProfileName, specifiedCoverageType, providedAPIKey, providedAPIToken string) *SoracomCompleter {
@@ -128,6 +153,17 @@ func (s *SoracomCompleter) flagSuggestions(line string) []gp.Suggest {
 			paramType:   p.Type,
 			enum:        p.Enum,
 		})
+	}
+
+	// soracom-cli will augment some commands with 'fetch-all' option, which is not defined in the swagger
+	for _, a := range commandsWithFetchAll {
+		if strings.HasPrefix(commands, a) {
+			params = append(params, param{
+				name:        "fetch-all",
+				required:    false,
+				description: "Do pagination automatically.",
+			})
+		}
 	}
 
 	sort.Slice(params, func(i, j int) bool {
@@ -255,6 +291,10 @@ func parseFlags(f string) []flag {
 
 	for _, value := range values {
 		switch {
+		case strings.HasPrefix(value, "--fetch-all"):
+			// this option is only option which don't take any value
+			inFlag = false
+			results = append(results, flag{"fetch-all", ""})
 		case strings.HasPrefix(value, "--"):
 			inFlag = true
 			name = strings.TrimPrefix(value, "--")
