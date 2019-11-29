@@ -79,3 +79,14 @@ var subscribers []struct {
 	TerminationEnabled bool   `json:"terminationEnabled"`
 	Type               string `json:"type"`
 }
+
+var devices []struct {
+	DeviceId     string `json:"deviceId"`
+	Endpoint     string `json:"endpoint"`
+	Imei         string `json:"imei"`
+	Imsi         string `json:"imsi"`
+	IPAddress    string `json:"ipAddress"`
+	Manufacturer string `json:"manufacturer"`
+	Online       bool   `json:"online"`
+	Status       string `json:"status"`
+}

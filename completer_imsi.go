@@ -10,15 +10,15 @@ import (
 )
 
 // naive cache which holds subscribers data for imsiFilterSuggestions
-var cache []gp.Suggest
+var subscribersCache []gp.Suggest
 
 var imsiFilterSuggestions = func(word, specifiedProfileName, specifiedCoverageType, providedAPIKey, providedAPIToken string) []gp.Suggest {
 	c := make(chan []gp.Suggest, 1024)
-	if len(cache) == 0 {
+	if len(subscribersCache) == 0 {
 		go getSubscribers(c, specifiedProfileName, specifiedCoverageType, providedAPIKey, providedAPIToken)
 		select {
 		case res := <-c:
-			cache = res
+			subscribersCache = res
 		case <-time.After(10 * time.Second):
 			return []gp.Suggest{{
 				Text:        "Downloading IMSI in background",
@@ -26,7 +26,7 @@ var imsiFilterSuggestions = func(word, specifiedProfileName, specifiedCoverageTy
 			}}
 		}
 	}
-	return filterFunc(cache, word, filterTextOrDescriptionFuzzy)
+	return filterFunc(subscribersCache, word, filterTextOrDescriptionFuzzy)
 }
 
 // filter by text or description based on
