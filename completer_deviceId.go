@@ -78,7 +78,7 @@ var getDevices = func(c chan<- []gp.Suggest, specifiedProfileName, specifiedCove
 		}
 		r = append(r, gp.Suggest{
 			Text: device.DeviceId,
-			Description: fmt.Sprintf("%-14s | %-10s | %-7s | %-8s | %15s | %15s | %s",
+			Description: fmt.Sprintf("%-14s | %-8s | %-8s | %-15s | %15s | %15s | %s",
 				trunc(device.Endpoint, 14),
 				device.Status,
 				online,
