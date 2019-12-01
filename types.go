@@ -5,21 +5,26 @@ import "github.com/soracom/soracom-cli/generators/lib"
 // SoracomCompleter returns suggestions for given go-prompt document.
 type SoracomCompleter struct {
 	// SORACOM CLI API definitions
-	apiDef                *lib.APIDefinitions
-	specifiedProfileName  string
-	specifiedCoverageType string
-	providedAPIKey        string
-	providedAPIToken      string
+	apiDef *lib.APIDefinitions
+	// worker which executes a command for device or imsi completion
+	worker *SoracomWorker
 }
 
 // SoracomExecutor executes given string with the shell.
 type SoracomExecutor struct {
+	// worker which executes a command
+	worker *SoracomWorker
+}
+
+// SoracomCExecutor executes given string with the shell.
+type SoracomWorker struct {
 	// shell which executes a command
-	shell                 string
-	specifiedProfileName  string
-	specifiedCoverageType string
-	providedAPIKey        string
-	providedAPIToken      string
+	shell        string
+	profileName  string
+	coverageType string
+	apiKey       string
+	apiToken     string
+	command      chan string
 }
 
 type flag struct {

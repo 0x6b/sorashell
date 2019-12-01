@@ -38,17 +38,14 @@ var commandsWithFetchAll = []string{"audit-logs napter get",
 	"vpg list"}
 
 // NewSoracomCompleter returns a SoracomCompleter which is based on  api definition loaded from given apiDefPath.
-func NewSoracomCompleter(apiDefPath, specifiedProfileName, specifiedCoverageType, providedAPIKey, providedAPIToken string) *SoracomCompleter {
+func NewSoracomCompleter(apiDefPath string, worker *SoracomWorker) *SoracomCompleter {
 	apiDef, err := loadAPIDef(apiDefPath)
 	if err != nil {
 		log.Fatalf("%+v\n", err)
 	}
 	return &SoracomCompleter{
 		apiDef,
-		specifiedProfileName,
-		specifiedCoverageType,
-		providedAPIKey,
-		providedAPIToken,
+		worker,
 	}
 }
 
@@ -245,10 +242,11 @@ func (s *SoracomCompleter) flagSuggestions(line string) []gp.Suggest {
 	case "speed-class-filter":
 		return speedClassFilterSuggestions(lastWord)
 	case "device-id":
-		return deviceIdFilterSuggestions(lastWord, s.specifiedProfileName, s.specifiedCoverageType, s.providedAPIKey, s.providedAPIToken)
+		return deviceIdFilterSuggestions(lastWord, s.worker)
 	case "imsi":
+		return imsiFilterSuggestions(lastWord, s.worker)
 	case "resource-id": // `logs get` or `audit-logs napter get` uses 'resource-id' for imsi
-		return imsiFilterSuggestions(lastWord, s.specifiedProfileName, s.specifiedCoverageType, s.providedAPIKey, s.providedAPIToken)
+		return imsiFilterSuggestions(lastWord, s.worker)
 	}
 
 	return suggests
@@ -358,4 +356,59 @@ func isFirstCommand(s string) bool {
 
 var filterFunc = func(suggestions []gp.Suggest, word string, function func(completions []gp.Suggest, sub string, ignoreCase bool) []gp.Suggest) []gp.Suggest {
 	return function(suggestions, word, true)
+}
+
+func trunc(s string, n int) string {
+	r := s
+	if len(s) > n {
+		if n > 3 {
+			n -= 3
+		}
+		r = s[0:n] + "..."
+	}
+	return r
+}
+
+// filter by text or description based on
+// https://github.com/c-bata/go-prompt/blob/f350bee28f376e06a9877a516ac4eabe01804013/filter.go#L31 (MIT)
+var filterTextOrDescriptionFuzzy = func(suggestions []gp.Suggest, sub string, ignoreCase bool) []gp.Suggest {
+	if sub == "" {
+		return suggestions
+	}
+	if ignoreCase {
+		sub = strings.ToUpper(sub)
+	}
+
+	ret := make([]gp.Suggest, 0, len(suggestions))
+	for i := range suggestions {
+		c := suggestions[i].Text + " " + suggestions[i].Description
+		if ignoreCase {
+			c = strings.ToUpper(c)
+		}
+		if fuzzyMatch(c, sub) {
+			ret = append(ret, suggestions[i])
+		}
+	}
+	return ret
+}
+
+func fuzzyMatch(s, sub string) bool {
+	sChars := []rune(s)
+	subChars := []rune(sub)
+	sIdx := 0
+
+	for _, c := range subChars {
+		found := false
+		for ; sIdx < len(sChars); sIdx++ {
+			if sChars[sIdx] == c {
+				found = true
+				sIdx++
+				break
+			}
+		}
+		if !found {
+			return false
+		}
+	}
+	return true
 }
