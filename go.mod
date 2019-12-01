@@ -1,4 +1,4 @@
-module github.com/soracom/soracom-shell
+module github.com/0x6b/sorashell
 
 go 1.13
 

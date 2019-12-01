@@ -1,4 +1,4 @@
-package shell
+package sorashell
 
 import "github.com/soracom/soracom-cli/generators/lib"
 

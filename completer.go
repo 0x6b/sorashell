@@ -1,9 +1,9 @@
-package shell
+package sorashell
 
 import (
+	_ "github.com/0x6b/sorashell/statik"
 	gp "github.com/c-bata/go-prompt"
 	sl "github.com/soracom/soracom-cli/generators/lib"
-	_ "github.com/soracom/soracom-shell/statik"
 	"log"
 	"regexp"
 	"sort"

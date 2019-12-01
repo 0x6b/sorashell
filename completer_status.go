@@ -1,4 +1,4 @@
-package shell
+package sorashell
 
 import gp "github.com/c-bata/go-prompt"
 

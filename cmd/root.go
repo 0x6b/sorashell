@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"fmt"
+	shell "github.com/0x6b/sorashell"
 	gp "github.com/c-bata/go-prompt"
-	shell "github.com/soracom/soracom-shell"
 	"github.com/spf13/cobra"
 )
 
@@ -20,7 +20,7 @@ func init() {
 }
 
 var RootCmd = &cobra.Command{
-	Use:   "soracom-shell",
+	Use:   "sorashell",
 	Short: "Interactive shell for SORACOM CLI",
 	Long:  "Interactive shell for SORACOM CLI",
 	Run: func(cmd *cobra.Command, args []string) {
@@ -28,16 +28,15 @@ var RootCmd = &cobra.Command{
 		executor := shell.NewSoracomExecutor(worker)
 		completer := shell.NewSoracomCompleter("/soracom-api.en.yaml", worker)
 
-		fmt.Print(` _  _  _      _ _       _     _    
-(_ / \|_) /\ / / \|\/| (_ |_||_ | | 
-__)\_/| \/--\\_\_/|  | __)| ||_ |_|_
-         Type exit or Ctrl-D to exit
+		fmt.Print(` _  _  _      _     _    
+(_ / \|_) /\ (_ |_||_ | | 
+__)\_/| \/--\__)| ||_ |_|_      Type exit or Ctrl-D to exit
 `)
 		gp.New(
 			executor.Execute,
 			completer.Complete,
-			gp.OptionTitle("SORACOM Shell"),
-			gp.OptionPrefix("SORACOM> "),
+			gp.OptionTitle("SORASHELL"),
+			gp.OptionPrefix("SORASHELL> "),
 			gp.OptionMaxSuggestion(5),
 
 			gp.OptionSuggestionBGColor(gp.Turquoise),
