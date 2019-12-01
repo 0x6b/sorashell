@@ -2,8 +2,8 @@ package sorashell
 
 import (
 	_ "github.com/0x6b/sorashell/statik"
-	gp "github.com/c-bata/go-prompt"
-	sl "github.com/soracom/soracom-cli/generators/lib"
+	"github.com/c-bata/go-prompt"
+	"github.com/soracom/soracom-cli/generators/lib"
 	"log"
 	"regexp"
 	"sort"
@@ -50,12 +50,12 @@ func NewSoracomCompleter(apiDefPath string, worker *SoracomWorker) *SoracomCompl
 }
 
 // Complete returns suggestions for given Document.
-func (s *SoracomCompleter) Complete(d gp.Document) []gp.Suggest {
+func (s *SoracomCompleter) Complete(d prompt.Document) []prompt.Suggest {
 	line := d.CurrentLine()
 
 	// return from hard corded Commands as atm don't have a way to find top-level commands from API definition
 	if isFirstCommand(line) {
-		s := filterFunc(Commands, line, gp.FilterFuzzy)
+		s := filterFunc(Commands, line, prompt.FilterFuzzy)
 		sort.Slice(s, func(i, j int) bool {
 			return s[i].Text < s[j].Text
 		})
@@ -63,13 +63,13 @@ func (s *SoracomCompleter) Complete(d gp.Document) []gp.Suggest {
 	}
 
 	if endsWithPipeOrRedirect(line) {
-		return []gp.Suggest{}
+		return []prompt.Suggest{}
 	}
 
 	return s.findSuggestions(line)
 }
 
-func (s *SoracomCompleter) findSuggestions(line string) []gp.Suggest {
+func (s *SoracomCompleter) findSuggestions(line string) []prompt.Suggest {
 	line = multipleSpaces.ReplaceAllString(line, " ")
 	commands, flags := splitToCommandsAndFlags(line)
 
@@ -80,10 +80,10 @@ func (s *SoracomCompleter) findSuggestions(line string) []gp.Suggest {
 }
 
 // return command suggestions.
-func (s *SoracomCompleter) commandSuggestion(commands string) []gp.Suggest {
+func (s *SoracomCompleter) commandSuggestion(commands string) []prompt.Suggest {
 	methods, found := s.searchMethods(commands)
 	if !found {
-		return []gp.Suggest{}
+		return []prompt.Suggest{}
 	}
 
 	if len(methods) == 1 {
@@ -97,7 +97,7 @@ func (s *SoracomCompleter) commandSuggestion(commands string) []gp.Suggest {
 		// - match result:     "users password delete"
 		// - number of spaces: 2
 		// - returns:          "delete"
-		return []gp.Suggest{
+		return []prompt.Suggest{
 			{
 				Text:        text,
 				Description: methods[0].Summary,
@@ -106,7 +106,7 @@ func (s *SoracomCompleter) commandSuggestion(commands string) []gp.Suggest {
 	}
 
 	tmp := make(map[string]bool)
-	suggestions := make([]gp.Suggest, 0)
+	suggestions := make([]prompt.Suggest, 0)
 	n := strings.Count(commands, " ")
 
 	// filter duplicates
@@ -119,7 +119,7 @@ func (s *SoracomCompleter) commandSuggestion(commands string) []gp.Suggest {
 			cli := cli[n]
 			if !tmp[cli] {
 				tmp[cli] = true
-				suggestions = append(suggestions, gp.Suggest{
+				suggestions = append(suggestions, prompt.Suggest{
 					Text:        cli,
 					Description: apiMethod.Summary,
 				})
@@ -131,11 +131,11 @@ func (s *SoracomCompleter) commandSuggestion(commands string) []gp.Suggest {
 }
 
 // return flag (name or value) suggestions.
-func (s *SoracomCompleter) flagSuggestions(line string) []gp.Suggest {
+func (s *SoracomCompleter) flagSuggestions(line string) []prompt.Suggest {
 	commands, flags := splitToCommandsAndFlags(line) // split again...
 	methods, found := s.searchMethods(commands)
 	if !found || len(methods) != 1 {
-		return []gp.Suggest{{
+		return []prompt.Suggest{{
 			Text:        "Error",
 			Description: "cannot find matching command",
 		}}
@@ -195,21 +195,21 @@ func (s *SoracomCompleter) flagSuggestions(line string) []gp.Suggest {
 
 	// provide flag name suggestion if user is entering flag
 	if isEnteringFlag {
-		r := make([]gp.Suggest, 0)
+		r := make([]prompt.Suggest, 0)
 		for _, p := range params {
-			if !contains(parseFlags(flags), sl.OptionCase(p.name)) {
+			if !contains(parseFlags(flags), lib.OptionCase(p.name)) {
 				required := ""
 				if p.required {
 					required = "(required) "
 				}
 
-				r = append(r, gp.Suggest{
-					Text:        "--" + sl.OptionCase(p.name),
+				r = append(r, prompt.Suggest{
+					Text:        "--" + lib.OptionCase(p.name),
 					Description: required + p.description,
 				})
 			}
 		}
-		return filterFunc(r, lastWord, gp.FilterFuzzy)
+		return filterFunc(r, lastWord, prompt.FilterFuzzy)
 	}
 
 	if strings.HasPrefix(lastWord, "--") {
@@ -218,19 +218,19 @@ func (s *SoracomCompleter) flagSuggestions(line string) []gp.Suggest {
 
 	// value suggestion
 	// if last flag's value type is enum, provide possible values
-	var suggests []gp.Suggest
+	var suggests []prompt.Suggest
 	for _, p := range params {
 		if p.name == lastFlag {
 			if len(p.enum) > 0 {
 				for _, e := range p.enum {
-					suggests = append(suggests, gp.Suggest{
+					suggests = append(suggests, prompt.Suggest{
 						Text:        e,
 						Description: "",
 					})
 				}
 			}
 			if len(suggests) > 0 {
-				return filterFunc(suggests, lastWord, gp.FilterFuzzy)
+				return filterFunc(suggests, lastWord, prompt.FilterFuzzy)
 			}
 		}
 	}
@@ -253,8 +253,8 @@ func (s *SoracomCompleter) flagSuggestions(line string) []gp.Suggest {
 }
 
 // search API methods which has x-soracom-cli definition starts with given term
-func (s *SoracomCompleter) searchMethods(term string) ([]sl.APIMethod, bool) {
-	found := make([]sl.APIMethod, 0)
+func (s *SoracomCompleter) searchMethods(term string) ([]lib.APIMethod, bool) {
+	found := make([]lib.APIMethod, 0)
 
 	for _, method := range s.apiDef.Methods {
 		if method.CLI == nil || len(method.CLI) == 0 {
@@ -354,7 +354,7 @@ func isFirstCommand(s string) bool {
 	return strings.TrimSpace(s) == "" || len(strings.Split(s, " ")) <= 1
 }
 
-var filterFunc = func(suggestions []gp.Suggest, word string, function func(completions []gp.Suggest, sub string, ignoreCase bool) []gp.Suggest) []gp.Suggest {
+var filterFunc = func(suggestions []prompt.Suggest, word string, function func(completions []prompt.Suggest, sub string, ignoreCase bool) []prompt.Suggest) []prompt.Suggest {
 	return function(suggestions, word, true)
 }
 
@@ -371,7 +371,7 @@ func trunc(s string, n int) string {
 
 // filter by text or description based on
 // https://github.com/c-bata/go-prompt/blob/f350bee28f376e06a9877a516ac4eabe01804013/filter.go#L31 (MIT)
-var filterTextOrDescriptionFuzzy = func(suggestions []gp.Suggest, sub string, ignoreCase bool) []gp.Suggest {
+var filterTextOrDescriptionFuzzy = func(suggestions []prompt.Suggest, sub string, ignoreCase bool) []prompt.Suggest {
 	if sub == "" {
 		return suggestions
 	}
@@ -379,7 +379,7 @@ var filterTextOrDescriptionFuzzy = func(suggestions []gp.Suggest, sub string, ig
 		sub = strings.ToUpper(sub)
 	}
 
-	ret := make([]gp.Suggest, 0, len(suggestions))
+	ret := make([]prompt.Suggest, 0, len(suggestions))
 	for i := range suggestions {
 		c := suggestions[i].Text + " " + suggestions[i].Description
 		if ignoreCase {

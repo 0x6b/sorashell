@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/rakyll/statik/fs"
-	sl "github.com/soracom/soracom-cli/generators/lib"
+	"github.com/soracom/soracom-cli/generators/lib"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
@@ -12,7 +12,7 @@ import (
 
 // loadAPIDef loads API definitions from the specified file
 // based on https://github.com/soracom/soracom-cli/blob/master/generators/lib/apidef_loader.go
-func loadAPIDef(apiDefYAMLFile string) (*sl.APIDefinitions, error) {
+func loadAPIDef(apiDefYAMLFile string) (*lib.APIDefinitions, error) {
 	apiDefYAML, err := loadAPIDefYAML(apiDefYAMLFile)
 	if err != nil {
 		return nil, err
@@ -29,7 +29,7 @@ func loadAPIDef(apiDefYAMLFile string) (*sl.APIDefinitions, error) {
 		return nil, err
 	}
 
-	return &sl.APIDefinitions{
+	return &lib.APIDefinitions{
 		Host:     apiDefMap["host"].(string),
 		BasePath: apiDefMap["basePath"].(string),
 		Methods:  methods,
@@ -60,8 +60,8 @@ func loadAPIDefYAML(inputFile string) (string, error) {
 	return bytes.NewBuffer(data).String(), nil
 }
 
-func loadMethods(apiDefMap map[interface{}]interface{}) ([]sl.APIMethod, error) {
-	result := make([]sl.APIMethod, 0, len(apiDefMap))
+func loadMethods(apiDefMap map[interface{}]interface{}) ([]lib.APIMethod, error) {
+	result := make([]lib.APIMethod, 0, len(apiDefMap))
 	paths := apiDefMap["paths"].(map[interface{}]interface{})
 	for path, p := range paths {
 		methods := p.(map[interface{}]interface{})
@@ -78,12 +78,12 @@ func loadMethods(apiDefMap map[interface{}]interface{}) ([]sl.APIMethod, error) 
 	return result, nil
 }
 
-func decodeAPIMethod(data map[interface{}]interface{}) (*sl.APIMethod, error) {
+func decodeAPIMethod(data map[interface{}]interface{}) (*lib.APIMethod, error) {
 	y, err := yaml.Marshal(&data)
 	if err != nil {
 		return nil, err
 	}
-	var result sl.APIMethod
+	var result lib.APIMethod
 	err = yaml.Unmarshal(y, &result)
 	if err != nil {
 		return nil, err

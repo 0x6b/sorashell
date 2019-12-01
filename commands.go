@@ -1,8 +1,8 @@
 package sorashell
 
-import gp "github.com/c-bata/go-prompt"
+import "github.com/c-bata/go-prompt"
 
-var Commands = []gp.Suggest{
+var Commands = []prompt.Suggest{
 	{Text: "audit-logs", Description: "Retrieve audit logs."},
 	{Text: "bills", Description: "Show or export billing info."},
 	{Text: "coupons", Description: "List or register coupons."},

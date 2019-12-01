@@ -1,9 +1,9 @@
 package sorashell
 
-import gp "github.com/c-bata/go-prompt"
+import "github.com/c-bata/go-prompt"
 
-var statusFilterSuggestions = func(word string) []gp.Suggest {
-	return filterFunc([]gp.Suggest{
+var statusFilterSuggestions = func(word string) []prompt.Suggest {
+	return filterFunc([]prompt.Suggest{
 		{Text: "active", Description: ""},
 		{Text: "inactive", Description: ""},
 		{Text: "instock", Description: ""},
@@ -11,5 +11,5 @@ var statusFilterSuggestions = func(word string) []gp.Suggest {
 		{Text: "shipped", Description: ""},
 		{Text: "suspended", Description: ""},
 		{Text: "terminated", Description: ""},
-	}, word, gp.FilterFuzzy)
+	}, word, prompt.FilterFuzzy)
 }

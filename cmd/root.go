@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"fmt"
-	shell "github.com/0x6b/sorashell"
-	gp "github.com/c-bata/go-prompt"
+	"github.com/0x6b/sorashell"
+	"github.com/c-bata/go-prompt"
 	"github.com/spf13/cobra"
 )
 
@@ -24,33 +24,33 @@ var RootCmd = &cobra.Command{
 	Short: "Interactive shell for SORACOM CLI",
 	Long:  "Interactive shell for SORACOM CLI",
 	Run: func(cmd *cobra.Command, args []string) {
-		worker := shell.NewSoracomWorker("/bin/sh", profileName, coverageType, apiKey, apiToken)
-		executor := shell.NewSoracomExecutor(worker)
-		completer := shell.NewSoracomCompleter("/soracom-api.en.yaml", worker)
+		worker := sorashell.NewSoracomWorker("/bin/sh", profileName, coverageType, apiKey, apiToken)
+		executor := sorashell.NewSoracomExecutor(worker)
+		completer := sorashell.NewSoracomCompleter("/soracom-api.en.yaml", worker)
 
 		fmt.Print(` _  _  _      _     _    
 (_ / \|_) /\ (_ |_||_ | | 
 __)\_/| \/--\__)| ||_ |_|_      Type exit or Ctrl-D to exit
 `)
-		gp.New(
+		prompt.New(
 			executor.Execute,
 			completer.Complete,
-			gp.OptionTitle("SORASHELL"),
-			gp.OptionPrefix("SORASHELL> "),
-			gp.OptionMaxSuggestion(5),
+			prompt.OptionTitle("SORASHELL"),
+			prompt.OptionPrefix("SORASHELL> "),
+			prompt.OptionMaxSuggestion(5),
 
-			gp.OptionSuggestionBGColor(gp.Turquoise),
-			gp.OptionSuggestionTextColor(gp.Black),
-			gp.OptionDescriptionBGColor(gp.LightGray),
-			gp.OptionDescriptionTextColor(gp.Black),
+			prompt.OptionSuggestionBGColor(prompt.Turquoise),
+			prompt.OptionSuggestionTextColor(prompt.Black),
+			prompt.OptionDescriptionBGColor(prompt.LightGray),
+			prompt.OptionDescriptionTextColor(prompt.Black),
 
-			gp.OptionSelectedSuggestionBGColor(gp.DarkGray),
-			gp.OptionSelectedSuggestionTextColor(gp.White),
-			gp.OptionSelectedDescriptionBGColor(gp.DarkGray),
-			gp.OptionSelectedDescriptionTextColor(gp.White),
+			prompt.OptionSelectedSuggestionBGColor(prompt.DarkGray),
+			prompt.OptionSelectedSuggestionTextColor(prompt.White),
+			prompt.OptionSelectedDescriptionBGColor(prompt.DarkGray),
+			prompt.OptionSelectedDescriptionTextColor(prompt.White),
 
-			gp.OptionPrefixTextColor(gp.Cyan),
-			gp.OptionPreviewSuggestionTextColor(gp.Blue),
+			prompt.OptionPrefixTextColor(prompt.Cyan),
+			prompt.OptionPreviewSuggestionTextColor(prompt.Blue),
 		).Run()
 	},
 }
