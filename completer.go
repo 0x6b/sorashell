@@ -240,7 +240,7 @@ func (s *SoracomCompleter) flagSuggestions(line string) []prompt.Suggest {
 	case "status-filter":
 		return s.statusFilterSuggestions(lastWord)
 	case "speed-class-filter":
-		return speedClassFilterSuggestions(lastWord)
+		return s.speedClassFilterSuggestions(lastWord)
 	case "device-id":
 		return s.deviceIdFilterSuggestions(lastWord)
 	case "imsi":

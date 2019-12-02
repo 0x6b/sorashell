@@ -2,7 +2,7 @@ package sorashell
 
 import "github.com/c-bata/go-prompt"
 
-var speedClassFilterSuggestions = func(word string) []prompt.Suggest {
+func (s *SoracomCompleter) speedClassFilterSuggestions(word string) []prompt.Suggest {
 	return filterFunc([]prompt.Suggest{
 		{Text: "s1.minimum", Description: "plan01s, plan01s - Low Data Volume, plan-D, plan-K"},
 		{Text: "s1.slow", Description: "plan01s, plan01s - Low Data Volume, plan-D, plan-K"},
