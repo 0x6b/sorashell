@@ -6,7 +6,7 @@ ASSETS = assets/en.yaml assets/ja.yaml assets/soracom-api.en.yaml assets/soracom
 STATIK = statik/statik.go
 
 $(BIN): $(SRC) $(STATIK)
-	$(GO) build -o $(BIN) ./cmd/shell
+	$(GO) build -trimpath -o $(BIN) ./cmd/shell
 
 $(STATIK): $(ASSETS)
 	statik -src=assets
