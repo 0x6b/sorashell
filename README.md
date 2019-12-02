@@ -1,4 +1,4 @@
-# soracom-shell
+# sorashell
 
 Interactive shell for [`soracom-cli`](https://github.com/soracom/soracom-cli/). Features include:
 
@@ -12,7 +12,7 @@ Interactive shell for [`soracom-cli`](https://github.com/soracom/soracom-cli/). 
 ## Usage
 
 1. Install and configure `soracom-cli` according to the repo's README
-2. Run `soracom-shell`
+2. Run `sorashell`
 3. The shell automatically provides suggestions as you type. Enjoy!
     - <kbd>Tab</kbd> to move cursor or display suggestions
     - <kbd>Space</kbd> to select
@@ -27,7 +27,7 @@ Interactive shell for [`soracom-cli`](https://github.com/soracom/soracom-cli/). 
 ### Build
 
 ```console
-$ make soracom-shell
+$ make sorashell
 ```
 
 ### Test

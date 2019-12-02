@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/soracom/soracom-shell/cmd"
+	"github.com/0x6b/sorashell/cmd"
 	"os"
 )
 

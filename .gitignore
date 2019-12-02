@@ -12,4 +12,4 @@ statik/*.go
 assets/*.yaml
 
 download-assets
-soracom-shell
+sorashell

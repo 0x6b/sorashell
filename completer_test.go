@@ -1,7 +1,7 @@
-package shell
+package sorashell
 
 import (
-	gp "github.com/c-bata/go-prompt"
+	"github.com/c-bata/go-prompt"
 	"github.com/stretchr/testify/suite"
 	"testing"
 )
@@ -12,7 +12,7 @@ type SoracomCompleterTestSuite struct {
 }
 
 func (suite *SoracomCompleterTestSuite) SetupTest() {
-	suite.completer = NewSoracomCompleter("/soracom-api.en.yaml")
+	suite.completer = NewSoracomCompleter("/soracom-api.en.yaml", NewSoracomWorker("/bin/sh", "", "", "", ""))
 }
 
 func (suite *SoracomCompleterTestSuite) TestSplitToCommandsAndFlags() {
@@ -144,10 +144,10 @@ func (suite *SoracomCompleterTestSuite) TestComplete() {
 	}
 
 	for _, t := range tests {
-		d := gp.Document{Text: t.input}
+		d := prompt.Document{Text: t.input}
 
 		complete := suite.completer.Complete(d)
-		r := toStringSlice(complete, func(d gp.Suggest) string {
+		r := toStringSlice(complete, func(d prompt.Suggest) string {
 			return d.Text
 		})
 
@@ -162,10 +162,10 @@ func (suite *SoracomCompleterTestSuite) TestIncompleteCommand() {
 	}
 
 	for _, t := range tests {
-		d := gp.Document{Text: t}
+		d := prompt.Document{Text: t}
 
 		complete := suite.completer.Complete(d)
-		r := toStringSlice(complete, func(d gp.Suggest) string {
+		r := toStringSlice(complete, func(d prompt.Suggest) string {
 			return d.Text
 		})
 
@@ -178,7 +178,7 @@ func TestSoracomCompleterTestSuite(t *testing.T) {
 	suite.Run(t, new(SoracomCompleterTestSuite))
 }
 
-func toStringSlice(suggests []gp.Suggest, f func(s gp.Suggest) string) []string {
+func toStringSlice(suggests []prompt.Suggest, f func(s prompt.Suggest) string) []string {
 	r := make([]string, len(suggests))
 	for i, v := range suggests {
 		r[i] = f(v)

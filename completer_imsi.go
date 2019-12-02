@@ -1,25 +1,25 @@
-package shell
+package sorashell
 
 import (
 	"encoding/json"
 	"fmt"
-	gp "github.com/c-bata/go-prompt"
+	"github.com/c-bata/go-prompt"
 	"strings"
 	"time"
 )
 
 // naive cache which holds subscribers data for imsiFilterSuggestions
-var subscribersCache []gp.Suggest
+var subscribersCache []prompt.Suggest
 
-var imsiFilterSuggestions = func(word string, worker *SoracomWorker) []gp.Suggest {
-	c := make(chan []gp.Suggest, 1024)
+var imsiFilterSuggestions = func(word string, worker *SoracomWorker) []prompt.Suggest {
+	c := make(chan []prompt.Suggest, 1024)
 	if len(subscribersCache) == 0 {
 		go getSubscribers(c, worker)
 		select {
 		case res := <-c:
 			subscribersCache = res
 		case <-time.After(10 * time.Second):
-			return []gp.Suggest{{
+			return []prompt.Suggest{{
 				Text:        "Downloading IMSI in background",
 				Description: "Hit space to see latest",
 			}}
@@ -28,12 +28,12 @@ var imsiFilterSuggestions = func(word string, worker *SoracomWorker) []gp.Sugges
 	return filterFunc(subscribersCache, word, filterTextOrDescriptionFuzzy)
 }
 
-var getSubscribers = func(c chan<- []gp.Suggest, worker *SoracomWorker) {
-	var r []gp.Suggest
+var getSubscribers = func(c chan<- []prompt.Suggest, worker *SoracomWorker) {
+	var r []prompt.Suggest
 
 	result := worker.Execute("subscribers list --fetch-all")
 	if err := json.NewDecoder(strings.NewReader(result)).Decode(&subscribers); err != nil {
-		c <- []gp.Suggest{{
+		c <- []prompt.Suggest{{
 			Text:        "Error while running 'subscribers list --fetch-all'",
 			Description: err.Error(),
 		}}
@@ -43,7 +43,7 @@ var getSubscribers = func(c chan<- []gp.Suggest, worker *SoracomWorker) {
 		if subscriber.SessionStatus.Online {
 			online = "online"
 		}
-		r = append(r, gp.Suggest{
+		r = append(r, prompt.Suggest{
 			Text: subscriber.Imsi,
 			Description: fmt.Sprintf("%-12s | %-10s | %-7s | %-8s | %-11s | %s",
 				trunc(subscriber.Subscription, 14),
