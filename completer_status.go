@@ -2,7 +2,7 @@ package sorashell
 
 import "github.com/c-bata/go-prompt"
 
-var statusFilterSuggestions = func(word string) []prompt.Suggest {
+func (s *SoracomCompleter) statusFilterSuggestions(word string) []prompt.Suggest {
 	return filterFunc([]prompt.Suggest{
 		{Text: "active", Description: ""},
 		{Text: "inactive", Description: ""},

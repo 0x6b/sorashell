@@ -11,10 +11,10 @@ import (
 // naive cache which holds subscribers data for imsiFilterSuggestions
 var devicesCache []prompt.Suggest
 
-var deviceIdFilterSuggestions = func(word string, worker *SoracomWorker) []prompt.Suggest {
+func (s *SoracomCompleter) deviceIdFilterSuggestions(word string) []prompt.Suggest {
 	c := make(chan []prompt.Suggest, 1024)
 	if len(devicesCache) == 0 {
-		go getDevices(c, worker)
+		go getDevices(c, s.worker)
 		select {
 		case res := <-c:
 			devicesCache = res

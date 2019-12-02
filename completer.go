@@ -238,15 +238,15 @@ func (s *SoracomCompleter) flagSuggestions(line string) []prompt.Suggest {
 	// if specific name is found, do more intelligent completion
 	switch lastFlag {
 	case "status-filter":
-		return statusFilterSuggestions(lastWord)
+		return s.statusFilterSuggestions(lastWord)
 	case "speed-class-filter":
 		return speedClassFilterSuggestions(lastWord)
 	case "device-id":
-		return deviceIdFilterSuggestions(lastWord, s.worker)
+		return s.deviceIdFilterSuggestions(lastWord)
 	case "imsi":
-		return imsiFilterSuggestions(lastWord, s.worker)
+		return s.imsiFilterSuggestions(lastWord)
 	case "resource-id": // `logs get` or `audit-logs napter get` uses 'resource-id' for imsi
-		return imsiFilterSuggestions(lastWord, s.worker)
+		return s.imsiFilterSuggestions(lastWord)
 	}
 
 	return suggests
