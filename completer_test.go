@@ -135,7 +135,7 @@ func (suite *SoracomCompleterTestSuite) TestComplete() {
 		},
 		{
 			input:    "subscribers list --speed-class-filter ",
-			expected: []string{"s1.minimum", "s1.slow", "s1.standard", "s1.fast", "s1.4xfast"},
+			expected: []string{"s1.minimum", "s1.slow", "s1.standard", "s1.fast", "s1.4xfast", "t1.standard", "u1.slow", "u1.standard"},
 		},
 		{
 			input:    "subscribers list --tag-value-match-mode ",
