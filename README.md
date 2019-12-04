@@ -7,7 +7,10 @@ Interactive shell for [`soracom-cli`](https://github.com/soracom/soracom-cli/). 
 
 ## Install
 
-...
+```console
+$ make sorashell
+$ cp ./sorashell /path/to/your/bin/directory
+```
 
 ## Usage
 
