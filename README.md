@@ -8,6 +8,7 @@ Interactive shell for [`soracom-cli`](https://github.com/soracom/soracom-cli/). 
 ## Install
 
 ```console
+$ go get github.com/rakyll/statik # install rakyll/statik, asset embedder
 $ make sorashell
 $ cp ./sorashell /path/to/your/bin/directory
 ```
