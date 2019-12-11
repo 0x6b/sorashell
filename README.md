@@ -39,7 +39,7 @@ You can:
 
 ## Limitation
 
-- `sorashell` has rough edges, and is not yet suitable for non-technical users.
+- `sorashell` has rough edges, and is not yet suitable for non-technical users. Please note that this is one of my first Go program :)
 - cannot handle parameters in body well e.g. createEventHandler
 - macOS only at this moment. PRs welcome!
 
