@@ -242,7 +242,12 @@ func (s *SoracomCompleter) flagSuggestions(line string) []prompt.Suggest {
 	case "speed-class-filter":
 		return s.speedClassFilterSuggestions(lastWord)
 	case "device-id":
-		return s.deviceIdFilterSuggestions(lastWord)
+		if strings.HasPrefix(commands, "device") {
+			return s.inventoryDeviceIdFilterSuggestions(lastWord)
+		}
+		if strings.HasPrefix(commands, "sigfox") {
+			return s.sigfoxDeviceIdFilterSuggestions(lastWord)
+		}
 	case "imsi":
 		return s.imsiFilterSuggestions(lastWord)
 	case "resource-id": // `logs get` or `audit-logs napter get` uses 'resource-id' for imsi
