@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-// NewSoracomExecutor returns a SoracomExecutor which executes commands with shell.
+// NewSoracomWorker returns a SoracomExecutor which executes commands with shell.
 func NewSoracomWorker(shell, profileName, coverageType, apiKey, apiToken string) *SoracomWorker {
 	c := make(chan string, 1)
 
@@ -25,6 +25,7 @@ func NewSoracomWorker(shell, profileName, coverageType, apiKey, apiToken string)
 	return sc
 }
 
+// Execute executes given string after simple parse
 func (w *SoracomWorker) Execute(s string) string {
 	s = strings.TrimSpace(s)
 	if s == "" {

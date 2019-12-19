@@ -2,6 +2,7 @@ package sorashell
 
 import "github.com/c-bata/go-prompt"
 
+// Commands define top-level commands from API definition
 var Commands = []prompt.Suggest{
 	{Text: "audit-logs", Description: "Retrieve audit logs."},
 	{Text: "bills", Description: "Show or export billing info."},

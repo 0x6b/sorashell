@@ -11,7 +11,7 @@ import (
 // naive cache which holds subscribers data for imsiFilterSuggestions
 var inventoryDevicesCache []prompt.Suggest
 
-func (s *SoracomCompleter) inventoryDeviceIdFilterSuggestions(word string) []prompt.Suggest {
+func (s *SoracomCompleter) inventoryDeviceIDFilterSuggestions(word string) []prompt.Suggest {
 	c := make(chan []prompt.Suggest, 1024)
 	if len(inventoryDevicesCache) == 0 {
 		go getInventoryDevices(c, s.worker)
@@ -44,7 +44,7 @@ var getInventoryDevices = func(c chan<- []prompt.Suggest, worker *SoracomWorker)
 			online = "online"
 		}
 		r = append(r, prompt.Suggest{
-			Text: device.DeviceId,
+			Text: device.DeviceID,
 			Description: fmt.Sprintf("%-14s | %-8s | %-8s | %-15s | %15s | %15s | %s",
 				trunc(device.Endpoint, 14),
 				device.Status,

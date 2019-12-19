@@ -16,9 +16,9 @@ type SoracomExecutor struct {
 	worker *SoracomWorker
 }
 
-// SoracomCExecutor executes given string with the shell.
+// SoracomWorker executes given string with the shell.
 type SoracomWorker struct {
-	// shell which executes a command
+	// shell which executes a command (NOT_USED)
 	shell        string
 	profileName  string
 	coverageType string
@@ -86,7 +86,7 @@ var subscribers []struct {
 }
 
 var inventoryDevices []struct {
-	DeviceId     string `json:"deviceId"`
+	DeviceID     string `json:"deviceId"`
 	Endpoint     string `json:"endpoint"`
 	Imei         string `json:"imei"`
 	Imsi         string `json:"imsi"`
@@ -97,7 +97,7 @@ var inventoryDevices []struct {
 }
 
 var sigfoxDevices []struct {
-	DeviceId string `json:"deviceId"`
+	DeviceID string `json:"deviceId"`
 	Status   string `json:"status"`
 	Tags     struct {
 		Name string `json:"name"`

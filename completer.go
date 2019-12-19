@@ -1,6 +1,7 @@
 package sorashell
 
 import (
+	// Register statik assets
 	_ "github.com/0x6b/sorashell/statik"
 	"github.com/c-bata/go-prompt"
 	"github.com/soracom/soracom-cli/generators/lib"
@@ -243,10 +244,10 @@ func (s *SoracomCompleter) flagSuggestions(line string) []prompt.Suggest {
 		return s.speedClassFilterSuggestions(lastWord)
 	case "device-id":
 		if strings.HasPrefix(commands, "device") {
-			return s.inventoryDeviceIdFilterSuggestions(lastWord)
+			return s.inventoryDeviceIDFilterSuggestions(lastWord)
 		}
 		if strings.HasPrefix(commands, "sigfox") {
-			return s.sigfoxDeviceIdFilterSuggestions(lastWord)
+			return s.sigfoxDeviceIDFilterSuggestions(lastWord)
 		}
 	case "imsi":
 		return s.imsiFilterSuggestions(lastWord)
