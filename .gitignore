@@ -10,6 +10,7 @@ helper/
 tmp/
 statik/*.go
 assets/*.yaml
+dist/
 
 download-assets
 sorashell
