@@ -9,7 +9,7 @@ $(BIN): $(SRC) $(STATIK)
 	$(GO) build -trimpath ./cmd/sorashell
 
 $(STATIK): $(ASSETS)
-	statik -src=assets
+	$(shell go env GOPATH)/bin/statik -src=assets
 
 $(ASSETS): $(BIN_DOWNLOAD)
 	./$(BIN_DOWNLOAD)
