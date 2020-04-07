@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-// naive cache which holds subscribers data for imsiFilterSuggestions
+// naive cache which holds inventory devices data for inventoryDeviceIDFilterSuggestions
 var inventoryDevicesCache []prompt.Suggest
 
 func (s *SoracomCompleter) inventoryDeviceIDFilterSuggestions(word string) []prompt.Suggest {
