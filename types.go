@@ -103,3 +103,49 @@ var sigfoxDevices []struct {
 		Name string `json:"name"`
 	} `json:"tags"`
 }
+
+var orders struct {
+	OrderList []struct {
+		Currency      string `json:"currency"`
+		Email         string `json:"email"`
+		OrderDateTime string `json:"orderDateTime"`
+		OrderID       string `json:"orderId"`
+		OrderItemList []struct {
+			Product struct {
+				Count            int           `json:"count"`
+				Currency         string        `json:"currency"`
+				Price            int           `json:"price"`
+				ProductCode      string        `json:"productCode"`
+				ProductImageURLs []interface{} `json:"productImageURLs"`
+				ProductName      string        `json:"productName"`
+				ProductType      string        `json:"productType"`
+				Properties       struct {
+					ContractType    string `json:"contractType"`
+					SimSize         string `json:"simSize"`
+					SimSubscription string `json:"simSubscription"`
+				} `json:"properties"`
+			} `json:"product"`
+			ProductAmount int `json:"productAmount"`
+			Quantity      int `json:"quantity"`
+		} `json:"orderItemList"`
+		OrderStatus     string `json:"orderStatus"`
+		ShippingAddress struct {
+			AddressLine1 string `json:"addressLine1"`
+			AddressLine2 string `json:"addressLine2"`
+			Building     string `json:"building"`
+			City         string `json:"city"`
+			CompanyName  string `json:"companyName"`
+			CountryCode  string `json:"countryCode"`
+			Department   string `json:"department"`
+			FullName     string `json:"fullName"`
+			PhoneNumber  string `json:"phoneNumber"`
+			State        string `json:"state"`
+			ZipCode      string `json:"zipCode"`
+		} `json:"shippingAddress"`
+		ShippingAddressID   string `json:"shippingAddressId"`
+		ShippingCost        int    `json:"shippingCost"`
+		ShippingLabelNumber string `json:"shippingLabelNumber"`
+		TaxAmount           int    `json:"taxAmount"`
+		TotalAmount         int    `json:"totalAmount"`
+	} `json:"orderList"`
+}

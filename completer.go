@@ -251,6 +251,8 @@ func (s *SoracomCompleter) flagSuggestions(line string) []prompt.Suggest {
 		}
 	case "imsi":
 		return s.imsiFilterSuggestions(lastWord)
+	case "order-id":
+		return s.orderFilterSuggestions(lastWord)
 	case "resource-id": // `logs get` or `audit-logs napter get` uses 'resource-id' for imsi
 		return s.imsiFilterSuggestions(lastWord)
 	}
