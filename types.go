@@ -149,3 +149,16 @@ var orders struct {
 		TotalAmount         int    `json:"totalAmount"`
 	} `json:"orderList"`
 }
+
+var groups []struct {
+	Configuration    interface{} `json:"configuration"`
+	CreatedAt        int64       `json:"createdAt"`
+	CreatedTime      int64       `json:"createdTime"`
+	GroupID          string      `json:"groupId"`
+	LastModifiedAt   int64       `json:"lastModifiedAt"`
+	LastModifiedTime int64       `json:"lastModifiedTime"`
+	OperatorID       string      `json:"operatorId"`
+	Tags             struct {
+		Name string `json:"name"`
+	} `json:"tags"`
+}
