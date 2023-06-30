@@ -30,9 +30,7 @@ func loadAPIDef(apiDefYAMLFile string) (*lib.APIDefinitions, error) {
 	}
 
 	return &lib.APIDefinitions{
-		Host:     apiDefMap["host"].(string),
-		BasePath: apiDefMap["basePath"].(string),
-		Methods:  methods,
+		Methods: methods,
 	}, nil
 }
 
